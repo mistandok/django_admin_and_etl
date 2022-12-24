@@ -1,0 +1,127 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-11-28 21:26+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\movies\apps.py:12
+msgid "movies"
+msgstr "movies"
+
+#: .\movies\models.py:32
+msgid "name"
+msgstr "name"
+
+#: .\movies\models.py:33 .\movies\models.py:81
+msgid "description"
+msgstr "description"
+
+#: .\movies\models.py:37
+msgid "Genre"
+msgstr "Genre"
+
+#: .\movies\models.py:38
+msgid "Genres"
+msgstr "Genres"
+
+#: .\movies\models.py:53
+msgid "full_name"
+msgstr "full name"
+
+#: .\movies\models.py:57
+msgid "Person"
+msgstr "Person"
+
+#: .\movies\models.py:58
+msgid "Persons"
+msgstr "Persons"
+
+#: .\movies\models.py:77
+msgid "Film"
+msgstr "Film"
+
+#: .\movies\models.py:78
+msgid "TV show"
+msgstr "TV show"
+
+#: .\movies\models.py:80
+msgid "title"
+msgstr "title"
+
+#: .\movies\models.py:82
+msgid "creation_date"
+msgstr "Дата создания"
+
+#: .\movies\models.py:84
+msgid "rating"
+msgstr "rating"
+
+#: .\movies\models.py:93
+msgid "type"
+msgstr "type"
+
+#: .\movies\models.py:104
+msgid "Filmwork"
+msgstr "Filmwork"
+
+#: .\movies\models.py:105
+#, fuzzy
+#| msgid "Filmwork"
+msgid "Filmworks"
+msgstr "Filmworks"
+
+#: .\movies\models.py:131
+msgid "Filmwork genre"
+msgstr "Filmwork genre"
+
+#: .\movies\models.py:132
+msgid "Filmwork genres"
+msgstr "Filmwork genres"
+
+#: .\movies\models.py:144
+#, python-brace-format
+msgid "The film {film} belongs to the genre {genre}"
+msgstr "The film {film} belongs to the genre {genre}"
+
+#: .\movies\models.py:154
+msgid "Actor"
+msgstr "Actor"
+
+#: .\movies\models.py:155
+msgid "Writer"
+msgstr "Writer"
+
+#: .\movies\models.py:156
+msgid "Director"
+msgstr "Director"
+
+#: .\movies\models.py:161
+msgid "role"
+msgstr "role"
+
+#: .\movies\models.py:171
+msgid "Filmwork participant"
+msgstr "Filmwork participant"
+
+#: .\movies\models.py:172
+msgid "Filmwork participants"
+msgstr "Filmwork participants"
+
+#: .\movies\models.py:184
+#, python-brace-format
+msgid "{person} participated in the filming of {film}"
+msgstr "{person} participated in the filming of {film}"
