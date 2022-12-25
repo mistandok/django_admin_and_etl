@@ -5,7 +5,7 @@ from datetime import datetime
 
 from redis import Redis
 
-from services.storages.key_value_storages import RedisStorage
+from ..key_value_storages import RedisStorage
 
 
 def get_redis_storage() -> RedisStorage:
