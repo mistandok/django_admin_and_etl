@@ -5,9 +5,9 @@ from typing import Any, Optional
 
 from redis import Redis
 
+from decorators.resiliency import backoff
 from .storage_typing import RedisKey, RedisValue
 from ..logs.logs_setup import get_logger
-from ..decorators.resiliency import backoff
 
 logger = get_logger(__name__)
 
@@ -99,8 +99,8 @@ class RedisStorage(KeyValueStorage):
             return None
 
 
-class BackoffDecoratorStorage(KeyValueStorage):
-    """Декоратор для хранилища, обеспечивающий отказоустойчивую работу с хранилищем."""
+class BaseDecorator(ABC):
+    """Интерфейс декоратора для работы с Key-Value хранилищем."""
 
     def __init__(self, storage: KeyValueStorage):
         """
@@ -110,6 +110,32 @@ class BackoffDecoratorStorage(KeyValueStorage):
             storage: декорируемое хранилище.
         """
         self._storage = storage
+
+    def get_value(self, key: Any) -> Optional[Any]:
+        """
+        Метод извлекает значение для указанного ключа из хранилища.
+
+        Args:
+            key (Any): ключ для поиска значения.
+
+        Returns:
+            value (Any): значение для указанного ключа
+        """
+        return self._storage.get_value(key)
+
+    def set_value(self, key: Any, key_value: Any):
+        """
+        Метод устанавливает значение для указанного ключа.
+
+        Args:
+            key (Any): ключ для поиска значения.
+            key_value (Any): значение для указанного ключа
+        """
+        self._storage.set_value(key, key_value)
+
+
+class BackoffKeyValueDecorator(BaseDecorator):
+    """Декоратор для хранилища, обеспечивающий отказоустойчивую работу с хранилищем."""
 
     @backoff()
     def get_value(self, key: Any) -> Optional[Any]:
