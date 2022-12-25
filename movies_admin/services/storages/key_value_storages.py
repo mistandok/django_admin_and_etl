@@ -7,6 +7,7 @@ from redis import Redis
 
 from .storage_typing import RedisKey, RedisValue
 from ..logs.logs_setup import get_logger
+from ..decorators.resiliency import backoff
 
 logger = get_logger(__name__)
 
@@ -55,6 +56,7 @@ class RedisStorage(KeyValueStorage):
         """
         self.redis_adater = redis_adapter
 
+    @backoff()
     def get_value(self, key: RedisKey) -> Optional[RedisValue]:
         """
         Метод извлекает значение для указанного ключа из хранилища.
@@ -68,6 +70,7 @@ class RedisStorage(KeyValueStorage):
         key_value = self.redis_adater.get(key)
         return self.decode_value(key_value)
 
+    @backoff()
     def set_value(self, key: RedisKey, key_value: RedisValue):
         """
         Метод устанавливает значение для указанного ключа.
