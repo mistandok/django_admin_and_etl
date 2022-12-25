@@ -36,6 +36,9 @@ class Genre(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"genre"
         verbose_name = _('Genre')
         verbose_name_plural = _('Genres')
+        indexes = [
+            models.Index(fields=['modified'], name='genre_modified_idx'),
+        ]
 
     def __str__(self):
         """
@@ -58,6 +61,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         verbose_name_plural = _('Persons')
         indexes = [
             models.Index(fields=['full_name'], name='person_full_name_idx'),
+            models.Index(fields=['modified'], name='person_modified_idx'),
         ]
 
     def __str__(self):
@@ -107,6 +111,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
             models.Index(fields=['title'], name='film_work_title_idx'),
             models.Index(fields=['creation_date'], name='film_work_creation_date_idx'),
             models.Index(fields=['rating'], name='film_work_rating_idx'),
+            models.Index(fields=['modified'], name='film_work_modified_idx'),
         ]
 
     def __str__(self):
