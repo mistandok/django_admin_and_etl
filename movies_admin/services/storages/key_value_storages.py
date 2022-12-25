@@ -56,7 +56,6 @@ class RedisStorage(KeyValueStorage):
         """
         self.redis_adater = redis_adapter
 
-    @backoff()
     def get_value(self, key: RedisKey) -> Optional[RedisValue]:
         """
         Метод извлекает значение для указанного ключа из хранилища.
@@ -70,7 +69,6 @@ class RedisStorage(KeyValueStorage):
         key_value = self.redis_adater.get(key)
         return self.decode_value(key_value)
 
-    @backoff()
     def set_value(self, key: RedisKey, key_value: RedisValue):
         """
         Метод устанавливает значение для указанного ключа.
@@ -99,6 +97,43 @@ class RedisStorage(KeyValueStorage):
             raise error
         except AttributeError:
             return None
+
+
+class BackoffDecoratorStorage(KeyValueStorage):
+    """Декоратор для хранилища, обеспечивающий отказоустойчивую работу с хранилищем."""
+
+    def __init__(self, storage: KeyValueStorage):
+        """
+        Инициализирующий метод.
+
+        Args:
+            storage: декорируемое хранилище.
+        """
+        self._storage = storage
+
+    @backoff()
+    def get_value(self, key: Any) -> Optional[Any]:
+        """
+        Метод извлекает значение для указанного ключа из хранилища.
+
+        Args:
+            key (Any): ключ для поиска значения.
+
+        Returns:
+            value (Any): значение для указанного ключа
+        """
+        return self._storage.get_value(key)
+
+    @backoff()
+    def set_value(self, key: Any, key_value: Any):
+        """
+        Метод устанавливает значение для указанного ключа.
+
+        Args:
+            key (Any): ключ для поиска значения.
+            key_value (Any): значение для указанного ключа
+        """
+        self._storage.set_value(key, key_value)
 
 
 class KeyValueStorageFactory:
