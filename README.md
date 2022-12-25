@@ -24,3 +24,8 @@
 3) Запуск контейнеров с перестройкой image - `docker-compose -f docker-compose.prod.yml up -d --build`
 4) Загрузка тестовых данных в БД (в базе появятся данные, необходимые для наглядной работы api) - `docker-compose -f docker-compose.prod.yml exec service python manage.py loaddata dumpdata.json`
 5) Перейдите по ссылке [localhost/admin](http://127.0.0.1:80/admin/), для входа в админку воспользуйтесь парой `логин/пароль: admin/admin`
+
+
+## Запуск редис
+
+`docker-compose -f redis.yml up -d --build`
