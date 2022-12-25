@@ -106,7 +106,7 @@ class KeyValueStorageFactory:
     }
 
     @staticmethod
-    def storage_by_type(storage_type: KyeValueStorageType, *args, **kwargs):
+    def storage_by_type(storage_type: KyeValueStorageType, *args, **kwargs) -> KeyValueStorage:
         """
         Метод возвращает инстанс хранилища по заданному типу.
 
@@ -122,5 +122,33 @@ class KeyValueStorageFactory:
             storage_class = KeyValueStorageFactory.storages[storage_type]
             return storage_class(*args, **kwargs)
         except KeyError as error:
-            logger.error(f'Для хранилища типа {storage_type.value} не существует реализации', exc_info=True)
+            logger.error(f'Для хранилища типа {storage_type.value} не существует реализации.', exc_info=True)
+            raise error
+
+
+class StorageAdapterFactory:
+    """Фабрика классов для адаптеров хранилищ."""
+
+    storage_adapters = {
+        KyeValueStorageType.REDIS: Redis,
+    }
+
+    @staticmethod
+    def storage_adapter_by_type(storage_type: KyeValueStorageType, *args, **kwargs) -> Any:
+        """
+        Метод возвращает инстанс адаптера хранилища по заданному типу.
+
+        Args:
+            storage_type: тип хранилища.
+            args: позиционные аргументы.
+            kwargs: именнованные аргументы.
+
+        Returns:
+            starage_adapter (Any): адаптер хранилища.
+        """
+        try:
+            starage_adapter = StorageAdapterFactory.storage_adapters[storage_type]
+            return starage_adapter(*args, **kwargs)
+        except KeyError as error:
+            logger.error(f'Для хранилища типа {storage_type.value} не существует адаптера хранилища.', exc_info=True)
             raise error
