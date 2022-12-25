@@ -1,9 +1,10 @@
-"""Модуль содержит api для работы с Key value хранилищами."""
+"""Модуль содержит api для работы хранилищами."""
 
 from storages.key_value_storages import BackoffKeyValueDecorator, StorageAdapterFactory, KeyValueStorageFactory
+from config.settings import StateStorageAdapterParams
 
 
-def get_backoff_key_value_storage(state_storage_params) -> BackoffKeyValueDecorator:
+def get_backoff_key_value_storage(state_storage_params: StateStorageAdapterParams) -> BackoffKeyValueDecorator:
     """
     Функция инициализирует отказоустойчивой key-value хранилище.
 

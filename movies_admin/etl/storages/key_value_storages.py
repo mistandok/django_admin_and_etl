@@ -1,21 +1,15 @@
 """Модуль отвечает за описание хранилищ типа Key-Value."""
 from abc import ABC, abstractmethod
-from enum import Enum
 from typing import Any, Optional
 
 from redis import Redis
-
+from config.settings import StorageType
 from decorators.resiliency import backoff
+from logs.logs_setup import get_logger
+
 from .storage_typing import RedisKey, RedisValue
-from ..logs.logs_setup import get_logger
 
 logger = get_logger(__name__)
-
-
-class KyeValueStorageType(Enum):
-    """Клас описывает доступные типы Key-Value хранилищ."""
-
-    REDIS = 'redis'
 
 
 class KeyValueStorage(ABC):
@@ -148,7 +142,7 @@ class BackoffKeyValueDecorator(BaseDecorator):
         Returns:
             value (Any): значение для указанного ключа
         """
-        return self._storage.get_value(key)
+        return super().get_value(key)
 
     @backoff()
     def set_value(self, key: Any, key_value: Any):
@@ -159,18 +153,18 @@ class BackoffKeyValueDecorator(BaseDecorator):
             key (Any): ключ для поиска значения.
             key_value (Any): значение для указанного ключа
         """
-        self._storage.set_value(key, key_value)
+        super().set_value(key, key_value)
 
 
 class KeyValueStorageFactory:
     """Фабрика классов для Key-Value хранилищ."""
 
     storages = {
-        KyeValueStorageType.REDIS: RedisStorage,
+        StorageType.REDIS: RedisStorage,
     }
 
     @staticmethod
-    def storage_by_type(storage_type: KyeValueStorageType, *args, **kwargs) -> KeyValueStorage:
+    def storage_by_type(storage_type: StorageType, *args, **kwargs) -> KeyValueStorage:
         """
         Метод возвращает инстанс хранилища по заданному типу.
 
@@ -194,11 +188,11 @@ class StorageAdapterFactory:
     """Фабрика классов для адаптеров хранилищ."""
 
     storage_adapters = {
-        KyeValueStorageType.REDIS: Redis,
+        StorageType.REDIS: Redis,
     }
 
     @staticmethod
-    def storage_adapter_by_type(storage_type: KyeValueStorageType, *args, **kwargs) -> Any:
+    def storage_adapter_by_type(storage_type: StorageType, *args, **kwargs) -> Any:
         """
         Метод возвращает инстанс адаптера хранилища по заданному типу.
 
@@ -211,8 +205,8 @@ class StorageAdapterFactory:
             starage_adapter (Any): адаптер хранилища.
         """
         try:
-            starage_adapter = StorageAdapterFactory.storage_adapters[storage_type]
-            return starage_adapter(*args, **kwargs)
+            storage_adapter = StorageAdapterFactory.storage_adapters[storage_type]
+            return storage_adapter(*args, **kwargs)
         except KeyError as error:
             logger.error(f'Для хранилища типа {storage_type.value} не существует адаптера хранилища.', exc_info=True)
             raise error
