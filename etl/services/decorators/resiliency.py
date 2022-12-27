@@ -1,9 +1,10 @@
 """Модуль отвечает за декораторы, которые помогают обеспечить отказоустойчивость работы функций."""
-import inspect
 from functools import wraps
 from time import sleep
 
 from ..logs.logs_setup import get_logger
+
+logger = get_logger()
 
 
 def backoff(start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: float = 10):
@@ -33,9 +34,6 @@ def backoff(start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: f
         Returns:
             callable.
         """
-        func_module = inspect.getmodule(func)
-        logger = get_logger(func_module.__name__)
-
         @wraps(func)
         def inner(*args, **kwargs):
             """

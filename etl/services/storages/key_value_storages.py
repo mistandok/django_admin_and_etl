@@ -9,7 +9,7 @@ from .storage_typing import RedisKey, RedisValue
 from ..decorators.resiliency import backoff
 from ..logs.logs_setup import get_logger
 
-logger = get_logger(__name__)
+logger = get_logger()
 
 
 class KeyValueStorage(ABC):
