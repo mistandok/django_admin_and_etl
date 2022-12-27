@@ -19,12 +19,6 @@ load_dotenv(find_dotenv(os.path.join(
 )))
 
 
-class StorageType(str, Enum):
-    """Клас описывает доступные типы Key-Value хранилищ."""
-
-    REDIS = 'redis'
-
-
 class ETLProcessType(str, Enum):
     """Тип доступных ETL процессов."""
 
@@ -33,17 +27,25 @@ class ETLProcessType(str, Enum):
     PERSON = 'person'
 
 
+STATE_STORAGE_TYPE = os.getenv('STATE_STORAGE_TYPE')
+
 REDIS_PORT = os.getenv('REDIS_PORT')
 
 REDIS_HOST = os.getenv('REDIS_HOST')
 
-STATE_STORAGE_PARAMS = StateStorageAdapterParams(
-    storage_type=StorageType.REDIS,
-    adapter_params={
-        'host': REDIS_HOST,
-        'port': REDIS_PORT,
-    },
-)
+
+match STATE_STORAGE_TYPE:
+    case 'redis':
+        STATE_STORAGE_PARAMS = StateStorageAdapterParams(
+            storage_type=STATE_STORAGE_TYPE,
+            adapter_params={
+                'host': REDIS_HOST,
+                'port': REDIS_PORT,
+            },
+        )
+    case _:
+        STATE_STORAGE_PARAMS = StateStorageAdapterParams(storage_type=None, adapter_params=None)
+
 
 PROCESS_IS_STARTED = 'process_is_started'
 

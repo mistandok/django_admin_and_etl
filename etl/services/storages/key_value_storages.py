@@ -1,14 +1,20 @@
 """Модуль отвечает за описание хранилищ типа Key-Value."""
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Any, Optional
 
 from redis import Redis
-from config.settings import StorageType
 from .storage_typing import RedisKey, RedisValue
 
 from ..logs.logs_setup import get_logger
 
 logger = get_logger()
+
+
+class StorageType(str, Enum):
+    """Клас описывает доступные типы Key-Value хранилищ."""
+
+    REDIS = 'redis'
 
 
 class KeyValueStorage(ABC):
