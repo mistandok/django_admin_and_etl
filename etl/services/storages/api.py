@@ -2,7 +2,8 @@
 
 from config.settings import StateStorageAdapterParams
 
-from .key_value_storages import BackoffKeyValueDecorator, StorageAdapterFactory, KeyValueStorageFactory
+from .key_value_storages import StorageAdapterFactory, KeyValueStorageFactory
+from .key_value_decorators import BackoffKeyValueDecorator
 
 
 def get_backoff_key_value_storage(state_storage_params: StateStorageAdapterParams) -> BackoffKeyValueDecorator:
