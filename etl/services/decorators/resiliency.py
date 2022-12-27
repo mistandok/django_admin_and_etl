@@ -3,7 +3,7 @@ import inspect
 from functools import wraps
 from time import sleep
 
-from logs.logs_setup import get_logger
+from ..logs.logs_setup import get_logger
 
 
 def backoff(start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: float = 10):

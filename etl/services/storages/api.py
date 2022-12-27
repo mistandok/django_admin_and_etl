@@ -1,7 +1,8 @@
 """Модуль содержит api для работы хранилищами."""
 
-from storages.key_value_storages import BackoffKeyValueDecorator, StorageAdapterFactory, KeyValueStorageFactory
 from config.settings import StateStorageAdapterParams
+
+from .key_value_storages import BackoffKeyValueDecorator, StorageAdapterFactory, KeyValueStorageFactory
 
 
 def get_backoff_key_value_storage(state_storage_params: StateStorageAdapterParams) -> BackoffKeyValueDecorator:

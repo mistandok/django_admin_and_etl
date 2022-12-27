@@ -8,10 +8,12 @@ from dotenv import load_dotenv, find_dotenv
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 StateStorageAdapterParams = namedtuple('StateStorageAdapterParams', ['storage_type', 'adapter_params'])
 
 load_dotenv(find_dotenv(os.path.join(
-    ROOT_DIR,
+    BASE_DIR,
     'config',
     '.env.prod',
 )))

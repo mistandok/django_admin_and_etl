@@ -3,9 +3,9 @@ import os
 from logging import INFO
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-BASE_DIR_FOR_LOGGING = os.path.join(ROOT_DIR, 'etl_logs')
+BASE_DIR_FOR_LOGGING = os.path.join(BASE_DIR, 'etl_logs')
 
 BASE_FORMAT = '%(name)s %(asctime)s %(levelname)s %(message)s'
 
