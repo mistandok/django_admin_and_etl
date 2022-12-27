@@ -34,20 +34,23 @@ REDIS_PORT = os.getenv('REDIS_PORT')
 REDIS_HOST = os.getenv('REDIS_HOST')
 
 
-match STATE_STORAGE_TYPE:
-    case 'redis':
-        STATE_STORAGE_PARAMS = StateStorageAdapterParams(
-            storage_type=STATE_STORAGE_TYPE,
-            adapter_params={
-                'host': REDIS_HOST,
-                'port': REDIS_PORT,
-            },
-        )
-    case _:
-        STATE_STORAGE_PARAMS = StateStorageAdapterParams(storage_type=None, adapter_params=None)
+STATE_STORAGE_PARAMS_MAP = {
+    'redis': StateStorageAdapterParams(
+        storage_type=STATE_STORAGE_TYPE,
+        adapter_params={
+            'host': REDIS_HOST,
+            'port': REDIS_PORT,
+        },
+    ),
+}
+
+STATE_STORAGE_PARAMS = STATE_STORAGE_PARAMS_MAP.get(
+    STATE_STORAGE_TYPE,
+    StateStorageAdapterParams(storage_type=None, adapter_params=None),
+)
 
 
-PROCESS_IS_STARTED = 'process_is_started'
+PROCESS_IS_STARTED_STATE = 'process_is_started'
 
 
 MODIFIED_STATE = {
