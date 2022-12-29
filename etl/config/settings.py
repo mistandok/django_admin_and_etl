@@ -50,6 +50,15 @@ STATE_STORAGE_PARAMS = STATE_STORAGE_PARAMS_MAP.get(
 )
 
 
+PG_DSL = {
+    'dbname': os.environ.get('PG_DB_NAME'),
+    'user': os.environ.get('PG_DB_USER'),
+    'password': os.environ.get('PG_DB_PASSWORD'),
+    'host': os.environ.get('PG_DB_HOST'),
+    'port': os.environ.get('PF_DB_PORT'),
+}
+
+
 PROCESS_IS_STARTED_STATE = 'process_is_started'
 
 
@@ -57,4 +66,10 @@ MODIFIED_STATE = {
     ETLProcessType.FILM_WORK: 'modified_film_work',
     ETLProcessType.GENRE: 'modified_genre',
     ETLProcessType.PERSON: 'modified_person',
+}
+
+QUERY_TYPE = {
+    ETLProcessType.FILM_WORK: 'postgres_filmwork',
+    ETLProcessType.GENRE: 'postgres_genre',
+    ETLProcessType.PERSON: 'postgres_person',
 }

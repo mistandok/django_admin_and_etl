@@ -3,23 +3,31 @@ SET SEARCH_PATH = content, public;
 
 SELECT
     fw.id,
+    fw.rating imdb_rating,
+    array_agg(DISTINCT g.name) as genre,
     fw.title,
     fw.description,
-    fw.rating,
-    fw.type,
-    fw.created,
-    fw.modified,
+    array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director') director,
+    array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'actor') actors_names,
+    array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'writer') writers_names,
     COALESCE (
        json_agg(
            DISTINCT jsonb_build_object(
-               'person_role', pfw.role,
-               'person_id', p.id,
-               'person_name', p.full_name
+               'id', p.id,
+               'name', p.full_name
            )
-       ) FILTER (WHERE p.id is not null),
+       ) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'actor'),
        '[]'
-    ) as persons,
-    array_agg(DISTINCT g.name) as genres,
+    ) as actors,
+    COALESCE (
+       json_agg(
+           DISTINCT jsonb_build_object(
+               'id', p.id,
+               'name', p.full_name
+           )
+       ) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'writer'),
+       '[]'
+    ) as writers,
     fw.modified modified_state
 FROM content.film_work fw
 LEFT JOIN content.person_film_work pfw ON pfw.film_work_id = fw.id
@@ -42,7 +50,6 @@ WITH person_ids AS (
         p.modified > '2022-12-25'::DATE
     ORDER BY
         p.modified
-    LIMIT 100
 )
 , film_ids AS (
     SELECT
@@ -53,7 +60,6 @@ WITH person_ids AS (
         content.person_film_work pfw ON fw.id = pfw.film_work_id
     WHERE
         pfw.person_id IN (SELECT p.id from person_ids p)
-    LIMIT 100
 )
 SELECT
     fw.id,

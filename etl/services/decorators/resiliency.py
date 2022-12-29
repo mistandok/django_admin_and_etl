@@ -7,7 +7,7 @@ from ..logs.logs_setup import get_logger
 logger = get_logger()
 
 
-def backoff(start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: float = 10):
+def backoff(start_sleep_time: float = 1, factor: int = 2, border_sleep_time: float = 10):
     """
     Функция для повторного выполнения функции через некоторое время, если возникла ошибка.
 

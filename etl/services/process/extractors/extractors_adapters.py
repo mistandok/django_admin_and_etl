@@ -27,4 +27,4 @@ class BaseExtractorAdapter(ABC):
         Returns:
             Возвращает адаптированные данные из источника.
         """
-        pass
+        return self._extractor.extract()

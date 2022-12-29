@@ -2,9 +2,9 @@
 from dataclasses import dataclass
 
 from config.settings import ETLProcessType, PROCESS_IS_STARTED_STATE
-from .extractors import BaseExtractor
-from .loaders import BaseLoader
-from .extractors_adapters import BaseExtractorAdapter
+from .extractors.extractors import BaseExtractor
+from .loaders.loaders import BaseLoader
+from .extractors.extractors_adapters import BaseExtractorAdapter
 from .exceptions import AnotherProcessIsStartedError
 
 from ..decorators.resiliency import backoff
@@ -87,9 +87,13 @@ class ETLProcess:
         try:
             data_for_load = self._extractor.extract()
             self._loader.load(data_for_load)
+            self._remember_last_modified_state()
             return True
         except Exception:
-            logger.error(f'Во время выполнения ETL-процесса {self._process_type} произошла непредвиденная ошибка.')
+            logger.error(
+                f'Во время выполнения ETL-процесса {self._process_type} произошла непредвиденная ошибка.',
+                exc_info=True,
+            )
             return False
 
     def block_process_state(self):
@@ -137,3 +141,6 @@ class ETLProcess:
             is_started: True - процесс запущен, False - процесс завершен.
         """
         self._state_storage.set_value(PROCESS_IS_STARTED_STATE, int(is_started))
+
+    def _remember_last_modified_state(self):
+        pass
