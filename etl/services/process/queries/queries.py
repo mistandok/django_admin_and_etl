@@ -110,24 +110,7 @@ class PostgreETLQuery(BaseETLQuery):
         Returns:
             modified_state: текущее значение moified_state в хранилище.
         """
-        modified_state = self._state_storage.get_value(self._modified_state_name)
-        try:
-            modified_state = int(modified_state)
-        except ValueError as error:
-            logger.error(
-                f'Нкорректное значение {self._modified_state_name} в хранилище: {modified_state}',
-                exc_info=True,
-            )
-            raise error
-        except TypeError:
-            return None
-
-        try:
-            modified_state = datetime.fromtimestamp(modified_state)
-        except TypeError:
-            return None
-
-        return modified_state
+        return self._state_storage.get_value(self._modified_state_name)
 
 
 class FilmworkPostgreETLQuery(PostgreETLQuery):

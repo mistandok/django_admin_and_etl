@@ -40,6 +40,15 @@ class BaseKeyValueDecorator(ABC):
         """
         self._storage.set_value(key, key_value)
 
+    def delete_key(self, key: Any):
+        """
+        Метод удаляет ключ из хранилища.
+
+        Args:
+            key (Any): ключ для удаления.
+        """
+        self._storage.delete_key(key)
+
 
 class BackoffKeyValueDecorator(BaseKeyValueDecorator):
     """Декоратор для хранилища, обеспечивающий отказоустойчивую работу с хранилищем."""
@@ -67,3 +76,13 @@ class BackoffKeyValueDecorator(BaseKeyValueDecorator):
             key_value (Any): значение для указанного ключа
         """
         super().set_value(key, key_value)
+
+    @backoff()
+    def delete_key(self, key: Any):
+        """
+        Метод удаляет ключ из хранилища.
+
+        Args:
+            key (Any): ключ для удаления.
+        """
+        super().delete_key(key)

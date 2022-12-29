@@ -1,7 +1,8 @@
 """Модуль отвечает за основной процесс по выгрузке данных из источника и загрузке данных в целевой объект."""
 from dataclasses import dataclass
+from datetime import datetime
 
-from config.settings import ETLProcessType, PROCESS_IS_STARTED_STATE
+from config.settings import ETLProcessType, PROCESS_IS_STARTED_STATE, MODIFIED_STATE, DATETIME_FORMAT
 from .extractors.extractors import BaseExtractor
 from .loaders.loaders import BaseLoader
 from .extractors.extractors_adapters import BaseExtractorAdapter
@@ -143,4 +144,21 @@ class ETLProcess:
         self._state_storage.set_value(PROCESS_IS_STARTED_STATE, int(is_started))
 
     def _remember_last_modified_state(self):
-        pass
+        """
+        Метод устанавливает новое значение для modified_state запущенного процесса.
+
+        Если данные из loader действительно использовались и мы что-то загрузили, то запишем состояние.
+        """
+        modified_state = self._extractor.last_modified_state
+        modified_state_name = MODIFIED_STATE.get(self._process_type)
+
+        if modified_state:
+            try:
+                new_value = datetime.strftime(modified_state, DATETIME_FORMAT)
+            except TypeError as error:
+                logger.error(f'Не удалось сохранить состояние {modified_state_name} со значением {modified_state}')
+                raise error
+            self._state_storage.set_value(modified_state_name, new_value)
+            logger.info(f'Для состояния {modified_state_name} установлено новое значение {new_value}')
+        else:
+            logger.info(f'Данных нет, не требуется установка нового значения состояния {modified_state_name}')

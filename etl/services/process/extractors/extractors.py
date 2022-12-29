@@ -1,27 +1,32 @@
 """Модуль отвечает за описание классов и функций для извлечения данных из источника."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Generator
+from typing import Generator
+from datetime import datetime
 
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictRow
 
 from services.logs.logs_setup import get_logger
-from services.decorators.resiliency import backoff
 from ..queries.queries import PostgreETLQuery
 
 logger = get_logger()
 
 
 class BaseExtractor(ABC):
-    """Базовый класс, отвечающий за выгрузку данных."""
+    """
+    Базовый класс, отвечающий за выгрузку данных.
+
+    Attributes:
+        last_modified_state (datetime): последнее modified_state, которое извлекли из генератора extract.
+    """
 
     def __init__(self):
         """Инициализирующий метод."""
-        self.last_modified_state = None
+        self.last_modified_state: datetime = None
 
     @abstractmethod
-    def extract(self) -> Any:
+    def extract(self) -> Generator:
         """
         Метод позволяет извлекать данные из объекта источника.
 
@@ -46,7 +51,6 @@ class PostgreExtractor(BaseExtractor):
         self._conn = connection
         self._query = query
 
-    @backoff
     def extract(self) -> Generator[DictRow, None, None]:
         """
         Метод позволяет извлекать данные из объекта источника.

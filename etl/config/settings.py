@@ -73,3 +73,5 @@ QUERY_TYPE = {
     ETLProcessType.GENRE: 'postgres_genre',
     ETLProcessType.PERSON: 'postgres_person',
 }
+
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'

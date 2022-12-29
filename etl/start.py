@@ -12,9 +12,10 @@ from services.decorators.resiliency import backoff
 
 if __name__ == '__main__':
     backoff_connect = backoff()(psycopg2.connect)
+    state_storage = get_backoff_key_value_storage(STATE_STORAGE_PARAMS)
     with contextlib.closing(backoff_connect(**PG_DSL, cursor_factory=DictCursor)) as conn:
-        process_type = ETLProcessType.GENRE
-        state_storage = get_backoff_key_value_storage(STATE_STORAGE_PARAMS)
+        process_type = ETLProcessType.FILM_WORK
+
         query = ETLQueryFactory.query_by_type(
             QUERY_TYPE.get(process_type),
             process_type=process_type,
