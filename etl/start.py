@@ -4,10 +4,11 @@ import contextlib
 import psycopg2
 from psycopg2.extras import DictCursor
 from psycopg2.extensions import connection as _connection
-from config.settings import STATE_STORAGE_PARAMS, PG_DSL, QUERY_TYPE
+from config.settings import STATE_STORAGE_PARAMS, PG_DSL, QUERY_TYPE, MODIFIED_STATE
 from services.storages.api import get_backoff_key_value_storage
 from services.process.processes import ETLProcess, ETLProcessType, ETLProcessParameters
 from services.process.extractors.extractors import PostgreExtractor
+from services.process.extractors.extractors_adapters import PostgreToElasticsearchAdapter
 from services.process.queries.queries import ETLQueryFactory
 from services.decorators.resiliency import backoff
 
@@ -31,7 +32,7 @@ def get_pg_to_es_etl_params(process_type: ETLProcessType, connection: _connectio
         process_type=process_type,
         state_storage=state_storage,
     )
-    extractor = PostgreExtractor(connection, query)
+    extractor = PostgreToElasticsearchAdapter(PostgreExtractor(connection, query))
     loader = None
 
     return ETLProcessParameters(
@@ -49,6 +50,7 @@ def main():
     with contextlib.closing(connect(**PG_DSL, cursor_factory=DictCursor)) as conn:
         for process_type in ETLProcessType:
             etl_params = get_pg_to_es_etl_params(process_type, conn)
+            etl_params.state_storage.delete_keys(MODIFIED_STATE.get(process_type))
             with ETLProcess(etl_params) as process:
                 process.start()
 

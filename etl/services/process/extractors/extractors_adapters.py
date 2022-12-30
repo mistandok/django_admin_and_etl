@@ -2,7 +2,8 @@
 
 
 from abc import ABC, abstractmethod
-from typing import Any
+from datetime import datetime
+from typing import Generator, Optional
 
 from .extractors import BaseExtractor
 
@@ -20,7 +21,7 @@ class BaseExtractorAdapter(ABC):
         self._extractor = extractor
 
     @abstractmethod
-    def extract(self) -> Any:
+    def extract(self) -> Generator:
         """
         Метод позволяет извлекать данные из объекта источника, адаптирует их под нужный формат.
 
@@ -28,3 +29,29 @@ class BaseExtractorAdapter(ABC):
             Возвращает адаптированные данные из источника.
         """
         return self._extractor.extract()
+
+    @property
+    def last_modified_state(self) -> Optional[datetime]:
+        """
+        Свойство возвращает последнее modified_state, которое было извлечено с помощью extractor.
+
+        Returns:
+            datetime
+        """
+        return self._extractor.last_modified_state
+
+
+class PostgreToElasticsearchAdapter(BaseExtractorAdapter):
+    """Класс преобразует данные из формата PostgreЫЙД к формату, требуемому в Elasticsearch."""
+
+    def extract(self) -> Generator[dict, None, None]:
+        """
+        Метод позволяет извлекать данные из объекта источника, адаптирует их под нужный формат.
+
+        Yields:
+            Возвращает адаптированные данные из источника.
+        """
+        extracted = super().extract()
+
+        for row in extracted:
+            yield dict(row)
