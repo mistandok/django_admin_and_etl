@@ -161,4 +161,7 @@ class ETLProcess:
             self._state_storage.set_value(modified_state_name, new_value)
             logger.info(f'Для состояния {modified_state_name} установлено новое значение {new_value}')
         else:
-            logger.info(f'Данных нет, не требуется установка нового значения состояния {modified_state_name}')
+            logger.info(f"""
+            Данных нет, или они не использовались для загрузки.
+            Не требуется установка нового значения состояния {modified_state_name}
+            """)
