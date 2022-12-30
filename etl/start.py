@@ -3,53 +3,21 @@ import contextlib
 
 import psycopg2
 from psycopg2.extras import DictCursor
-from psycopg2.extensions import connection as _connection
-from config.settings import STATE_STORAGE_PARAMS, PG_DSL, QUERY_TYPE, MODIFIED_STATE
-from services.storages.api import get_backoff_key_value_storage
-from services.process.processes import ETLProcess, ETLProcessType, ETLProcessParameters
-from services.process.extractors.extractors import PostgreExtractor
-from services.process.extractors.extractors_adapters import PostgreToElasticsearchAdapter
-from services.process.queries.queries import ETLQueryFactory
+from config.settings import PG_DSL, ES_CONNECTION, REDIS_HOST, REDIS_PORT, ETLProcessType, MODIFIED_STATE
 from services.decorators.resiliency import backoff
-
-
-def get_pg_to_es_etl_params(process_type: ETLProcessType, connection: _connection) -> ETLProcessParameters:
-    """
-    Функция подготавливает параметры для старта ETL-процесса.
-
-    Данные выгружаются из PostgreSQL и загружаются в Elasticsearch.
-
-    Args:
-        connection: соединение с базой данных.
-        process_type: тип запускаемого процесса.
-
-    Returns:
-        параметры для ETL-процесса.
-    """
-    state_storage = get_backoff_key_value_storage(STATE_STORAGE_PARAMS)
-    query = ETLQueryFactory.query_by_type(
-        query_type=QUERY_TYPE.get(process_type),
-        process_type=process_type,
-        state_storage=state_storage,
-    )
-    extractor = PostgreToElasticsearchAdapter(PostgreExtractor(connection, query))
-    loader = None
-
-    return ETLProcessParameters(
-        state_storage=state_storage,
-        process_type=process_type,
-        extractor=extractor,
-        loader=loader,
-    )
+from services.context_managers.managers import redis_context, es_context
+from services.process.constructors import get_etl_params_for_redis_pg_es
+from services.process.processes import ETLProcess
 
 
 def main():
     """Основная функция, стартующая ETL-процессы."""
     connect = backoff()(psycopg2.connect)
 
-    with contextlib.closing(connect(**PG_DSL, cursor_factory=DictCursor)) as conn:
+    with redis_context(REDIS_HOST, REDIS_PORT) as redis, es_context(ES_CONNECTION) as es, \
+            contextlib.closing(connect(**PG_DSL, cursor_factory=DictCursor)) as pg:
         for process_type in ETLProcessType:
-            etl_params = get_pg_to_es_etl_params(process_type, conn)
+            etl_params = get_etl_params_for_redis_pg_es(process_type, pg, redis, es)
             etl_params.state_storage.delete_keys(MODIFIED_STATE.get(process_type))
             with ETLProcess(etl_params) as process:
                 process.start()

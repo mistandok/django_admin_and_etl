@@ -27,28 +27,9 @@ class ETLProcessType(str, Enum):
     PERSON = 'person'
 
 
-STATE_STORAGE_TYPE = os.getenv('STATE_STORAGE_TYPE')
-
 REDIS_PORT = os.getenv('REDIS_PORT')
 
 REDIS_HOST = os.getenv('REDIS_HOST')
-
-
-STATE_STORAGE_PARAMS_MAP = {
-    'redis': StateStorageAdapterParams(
-        storage_type=STATE_STORAGE_TYPE,
-        adapter_params={
-            'host': REDIS_HOST,
-            'port': REDIS_PORT,
-        },
-    ),
-}
-
-STATE_STORAGE_PARAMS = STATE_STORAGE_PARAMS_MAP.get(
-    STATE_STORAGE_TYPE,
-    StateStorageAdapterParams(storage_type=None, adapter_params=None),
-)
-
 
 PG_DSL = {
     'dbname': os.environ.get('PG_DB_NAME'),
@@ -58,9 +39,13 @@ PG_DSL = {
     'port': os.environ.get('PF_DB_PORT'),
 }
 
+ES_HOST = 'localhost'
+
+ES_PORT = 9200
+
+ES_CONNECTION = f'http://{ES_HOST}:{ES_PORT}'
 
 PROCESS_IS_STARTED_STATE = 'process_is_started'
-
 
 MODIFIED_STATE = {
     ETLProcessType.FILM_WORK: 'modified_film_work',

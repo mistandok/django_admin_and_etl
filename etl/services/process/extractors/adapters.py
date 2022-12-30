@@ -8,6 +8,22 @@ from typing import Generator, Optional
 from .extractors import BaseExtractor
 
 
+class Row(dict):
+    """Класс-помощник для адаптируемых строк."""
+
+    def exclude_fields(self, *field_names: str):
+        """
+        Метод удаляет поля из объекта.
+
+        Args:
+            field_names (str): наименование поля.
+        """
+        for field_name in field_names:
+            if field_name not in self.keys():
+                continue
+            self.pop(field_name)
+
+
 class BaseExtractorAdapter(ABC):
     """Базовый класс, отвечающий за выгрузку данных."""
 
@@ -53,5 +69,9 @@ class PostgreToElasticsearchAdapter(BaseExtractorAdapter):
         """
         extracted = super().extract()
 
+        fields_for_exclude = ['modified_state']
+
         for row in extracted:
-            yield dict(row)
+            row = Row(row)
+            row.exclude_fields(*fields_for_exclude)
+            yield row
