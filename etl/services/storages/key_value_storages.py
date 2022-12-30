@@ -43,12 +43,12 @@ class KeyValueStorage(ABC):
         """
 
     @abstractmethod
-    def delete_key(self, key: Any):
+    def delete_keys(self, *keys: Any):
         """
         Метод удаляет ключ из хранилища.
 
         Args:
-            key (Any): ключ для удаления.
+            keys (Any): ключ для удаления.
         """
 
 
@@ -87,14 +87,14 @@ class RedisStorage(KeyValueStorage):
         """
         self.redis_adater.set(key, key_value)
 
-    def delete_key(self, key: Any):
+    def delete_keys(self, *keys: Any):
         """
         Метод удаляет ключ из хранилища.
 
         Args:
-            key (Any): ключ для удаления.
+            keys (Any): ключ для удаления.
         """
-        self.redis_adater.delete(key)
+        self.redis_adater.delete(*keys)
 
     @staticmethod
     def decode_value(value_for_decode: bytes) -> Optional[RedisValue]:
