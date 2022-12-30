@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from config.settings import ETLProcessType, PROCESS_IS_STARTED_STATE, MODIFIED_STATE, DATETIME_FORMAT
+
 from .extractors.extractors import BaseExtractor
 from .loaders.loaders import BaseLoader
-from .extractors.extractors_adapters import BaseExtractorAdapter
+from .extractors.adapters import BaseExtractorAdapter
 from .exceptions import AnotherProcessIsStartedError
-
 from ..decorators.resiliency import backoff
 from ..storages.key_value_storages import KeyValueStorage
 from ..storages.key_value_decorators import BaseKeyValueDecorator
@@ -87,9 +87,13 @@ class ETLProcess:
         """
         try:
             data_for_load = self._extractor.extract()
-            self._loader.load(data_for_load)
-            self._remember_last_modified_state()
-            return True
+            is_success_load = self._loader.load(data_for_load)
+
+            if is_success_load:
+                self._remember_last_modified_state()
+                return True
+
+            return False
         except Exception:
             logger.error(
                 f'Во время выполнения ETL-процесса {self._process_type} произошла непредвиденная ошибка.',

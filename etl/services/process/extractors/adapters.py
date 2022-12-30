@@ -74,4 +74,5 @@ class PostgreToElasticsearchAdapter(BaseExtractorAdapter):
         for row in extracted:
             row = Row(row)
             row.exclude_fields(*fields_for_exclude)
+            row.update({'_id': row.get('id')})
             yield row

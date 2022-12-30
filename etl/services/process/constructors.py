@@ -8,6 +8,7 @@ from services.process.extractors.adapters import PostgreToElasticsearchAdapter
 from services.process.extractors.extractors import PostgreExtractor
 from services.process.processes import ETLProcessType, ETLProcessParameters
 from services.process.queries.queries import ETLQueryFactory
+from services.process.loaders.loaders import ElasticsearchLoader
 from services.storages.key_value_storages import RedisStorage
 from services.storages.key_value_decorators import BackoffKeyValueDecorator
 
@@ -39,7 +40,7 @@ def get_etl_params_for_redis_pg_es(
         state_storage=state_storage,
     )
     extractor = PostgreToElasticsearchAdapter(PostgreExtractor(pg_conn, query))
-    loader = None
+    loader = ElasticsearchLoader(es_client)
 
     return ETLProcessParameters(
         state_storage=state_storage,
