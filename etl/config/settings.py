@@ -41,11 +41,11 @@ PG_DSL = {
     'port': os.environ.get('PF_DB_PORT'),
 }
 
-ES_HOST = 'localhost'
+ES_HOST = os.environ.get('ES_HOST')
 
-ES_PORT = 9200
+ES_PORT = os.environ.get('ES_PORT')
 
-ES_TARGET_INDEX = 'movies'
+ES_TARGET_INDEX = os.environ.get('ES_TARGET_INDEX')
 
 ES_INDEX_JSON_PATH = os.path.join(BASE_DIR, 'config', 'elasticsearch_index.json')
 

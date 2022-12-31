@@ -32,6 +32,31 @@ services:
       - service
     ports:
       - 80:80
+  etl:
+      build:
+        context: ./etl
+        dockerfile: Dockerfile-prod
+      volumes:
+        - static_volume:/opt/app/staticfiles
+        - media_volume:/opt/app/mediafiles
+      env_file:
+        - ./etl/config/.env.prod
+      depends_on:
+        - database
+        - elasticsearch
+  elasticsearch:
+    image: elasticsearch:8.5.3
+    expose:
+      - 9200
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms6g -Xmx6g
+      USE_SSL: false
+      xpack.security.enabled: false
+  redis:
+    image: redis:latest
+    expose:
+      - 6379
 volumes:
   postgres_data:
   static_volume:
