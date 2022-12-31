@@ -110,7 +110,9 @@ class PostgreETLQuery(BaseETLQuery):
         Returns:
             modified_state: текущее значение moified_state в хранилище.
         """
-        return self._state_storage.get_value(self._modified_state_name)
+        modified_state = self._state_storage.get_value(self._modified_state_name)
+        logger.info(f'modified state для {self._process_type} равно: {modified_state}')
+        return modified_state
 
 
 class FilmworkPostgreETLQuery(PostgreETLQuery):

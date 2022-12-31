@@ -27,6 +27,8 @@ class ETLProcessType(str, Enum):
     PERSON = 'person'
 
 
+TIME_TO_RESTART_PROCESSES_SECONDS = 10
+
 REDIS_PORT = os.getenv('REDIS_PORT')
 
 REDIS_HOST = os.getenv('REDIS_HOST')

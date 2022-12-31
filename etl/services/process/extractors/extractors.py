@@ -73,5 +73,5 @@ class PostgreExtractor(BaseExtractor):
                     break
 
                 for row in table_data:
-                    self.last_modified_state = row.get('modified_state')
                     yield row
+                    self.last_modified_state = row.get('modified_state')
