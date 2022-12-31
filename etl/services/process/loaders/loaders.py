@@ -8,7 +8,7 @@ from elasticsearch.helpers import bulk
 from config.settings import ES_TARGET_INDEX
 from services.logs.logs_setup import get_logger
 
-from .validators import ElasticsearchValidator
+from ..validators.validators import ElasticsearchValidator
 
 logger = get_logger()
 

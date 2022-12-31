@@ -8,7 +8,10 @@ BASE_QUERY = """
         array_agg(DISTINCT g.name) FILTER (WHERE g.id IS NOT NULL) as genre,
         fw.title,
         fw.description,
-        array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director') director,
+        COALESCE (
+            array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director'),
+            ARRAY[]::text[]
+        ) director,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'actor') actors_names,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'writer') writers_names,
         COALESCE (
