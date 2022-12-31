@@ -47,6 +47,8 @@ ES_PORT = 9200
 
 ES_TARGET_INDEX = 'movies'
 
+ES_INDEX_JSON_PATH = os.path.join(BASE_DIR, 'config', 'elasticsearch_index.json')
+
 ES_CONNECTION = f'http://{ES_HOST}:{ES_PORT}'
 
 PROCESS_IS_STARTED_STATE = 'process_is_started'
