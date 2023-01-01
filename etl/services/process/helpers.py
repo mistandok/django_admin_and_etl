@@ -4,7 +4,7 @@ import json
 from psycopg2.extensions import connection as postgre_conn
 from redis import Redis
 from elasticsearch import Elasticsearch
-from config.settings import QUERY_TYPE, ES_TARGET_INDEX, ES_INDEX_JSON_PATH
+from config.settings import QUERY_TYPE, ES_TARGET_INDEX, ES_INDEX_JSON_PATH, DB_BUFFER_SIZE
 from services.process.extractors.adapters import PostgreToElasticsearchAdapter
 from services.process.extractors.extractors import PostgreExtractor
 from services.process.processes import ETLProcessType, ETLProcessParameters
@@ -40,8 +40,8 @@ def get_etl_params_for_redis_pg_es(
         process_type=etl_process_type,
         state_storage=state_storage,
     )
-    extractor = PostgreToElasticsearchAdapter(PostgreExtractor(pg_conn, query))
-    loader = ElasticsearchLoader(es_client)
+    extractor = PostgreToElasticsearchAdapter(PostgreExtractor(pg_conn, query, DB_BUFFER_SIZE))
+    loader = ElasticsearchLoader(es_client, ES_TARGET_INDEX)
 
     return ETLProcessParameters(
         state_storage=state_storage,

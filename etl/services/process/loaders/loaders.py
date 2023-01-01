@@ -5,7 +5,6 @@ from typing import Iterable
 
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import bulk
-from config.settings import ES_TARGET_INDEX
 from services.logs.logs_setup import get_logger
 
 from ..validators.validators import ElasticsearchValidator
@@ -33,15 +32,17 @@ class BaseLoader(ABC):
 class ElasticsearchLoader(BaseLoader):
     """Класс, отвечающий за загрузку данных в Elasticsearch."""
 
-    def __init__(self, client: Elasticsearch):
+    def __init__(self, client: Elasticsearch, target_index: str):
         """
         Инициализирующий метод.
 
         Args:
             client: клиент Elasticsearch.
+            target_index: целевой индекс для загрузки.
         """
         self._client = client
         self._validator = ElasticsearchValidator()
+        self._target_index = target_index
 
     def load(self, data_for_load: Iterable[dict]) -> bool:
         """
@@ -55,6 +56,6 @@ class ElasticsearchLoader(BaseLoader):
         """
         logger.info('Загружаем данные в Elasticsearch.')
         valid_data = self._validator.get_valid_data(data_for_load)
-        bulk(self._client, valid_data, index=ES_TARGET_INDEX)
+        bulk(self._client, valid_data, index=self._target_index)
         logger.info('Загрузили данные в Elasticsearch.')
         return True

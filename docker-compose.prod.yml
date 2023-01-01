@@ -44,6 +44,7 @@ services:
       depends_on:
         - database
         - elasticsearch
+        - redis
       restart: always
   elasticsearch:
     image: elasticsearch:8.5.3

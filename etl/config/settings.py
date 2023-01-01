@@ -66,3 +66,5 @@ QUERY_TYPE = {
 }
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
+
+DB_BUFFER_SIZE = int(os.environ.get('DB_BUFFER_SIZE', 100))

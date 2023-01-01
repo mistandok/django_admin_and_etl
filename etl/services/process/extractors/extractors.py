@@ -39,17 +39,19 @@ class BaseExtractor(ABC):
 class PostgreExtractor(BaseExtractor):
     """Класс для извлечения данных из PostgreSQL."""
 
-    def __init__(self, connection: _connection, query: PostgreETLQuery):
+    def __init__(self, connection: _connection, query: PostgreETLQuery, buffer_size: int):
         """
         Инициализаирующий метод.
 
         Args:
             connection: соединение с PostgreSQL.
             query: Запрос, который необходимо выполнить для извлечения данных.
+            buffer_size: Размер буфера для выгрузки данных.
         """
         super().__init__()
         self._conn = connection
         self._query = query
+        self._buffer_size = buffer_size
 
     def extract(self) -> Generator[DictRow, None, None]:
         """
@@ -67,7 +69,7 @@ class PostgreExtractor(BaseExtractor):
             cursor.execute(self._query.get_sql())
 
             while True:
-                table_data = cursor.fetchmany(100)
+                table_data = cursor.fetchmany(self._buffer_size)
 
                 if not table_data:
                     break
@@ -75,3 +77,5 @@ class PostgreExtractor(BaseExtractor):
                 for row in table_data:
                     yield row
                     self.last_modified_state = row.get('modified_state')
+
+            logger.info('Считали все данные из PostgreSQL.')
