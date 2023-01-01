@@ -44,10 +44,11 @@ services:
       depends_on:
         - database
         - elasticsearch
+      restart: always
   elasticsearch:
     image: elasticsearch:8.5.3
-    expose:
-      - 9200
+    ports:
+      - 9200:9200
     environment:
       discovery.type: single-node
       ES_JAVA_OPTS: -Xms6g -Xmx6g

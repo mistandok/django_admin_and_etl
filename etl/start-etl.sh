@@ -1,25 +1,33 @@
 #!/bin/sh
 
-if [ ${DB_TYPE} = "postgres" ]
-then
-  echo "Waiting for PostgreSQL..."
+wait_database()
+{
+  HOST=$1
+  PORT=$2
+  TYPE=$3
 
-  while ! nc -z $DB_HOST $DB_PORT; do
+  echo "Waiting for $TYPE..."
+
+  while ! nc -z $HOST $PORT; do
     sleep 0.1
   done
 
-  echo "PostgreSQL started"
+  echo "$TYPE started"
+}
+
+if [ ${DB_TYPE} = "postgres" ]
+  then
+    wait_database $DB_HOST $DB_PORT $DB_TYPE
 fi
 
 if [ ${TARGET_DB_TYPE} = "elasticsearch" ]
-then
-  echo "Waiting for Elasticsearch..."
+  then
+    wait_database $ES_HOST $ES_PORT $TARGET_DB_TYPE
+fi
 
-  while ! nc -z $ES_HOST $ES_PORT; do
-    sleep 0.1
-  done
-
-  echo "Elasticsearch started"
+if [ ${STATE_STORAGE_TYPE} = "redis" ]
+  then
+    wait_database $REDIS_HOST $REDIS_PORT $STATE_STORAGE_TYPE
 fi
 
 python ./start.py
