@@ -1,6 +1,7 @@
 """Модуль содержит классы и функции, помогающие задавать параметры для ETL-процессов."""
 import json
 
+from http import HTTPStatus
 from psycopg2.extensions import connection as postgre_conn
 from redis import Redis
 from elasticsearch import Elasticsearch
@@ -58,7 +59,9 @@ def drop_es(es_client: Elasticsearch):
     Args:
         es_client: клиент эластики
     """
-    es_client.options(ignore_status=[400, 404]).indices.delete(index=ES_TARGET_INDEX)
+    es_client.options(
+        ignore_status=[HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND],
+    ).indices.delete(index=ES_TARGET_INDEX)
 
 
 def create_es_index_if_not_exists(es_client: Elasticsearch):
