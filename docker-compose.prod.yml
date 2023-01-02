@@ -36,9 +36,6 @@ services:
       build:
         context: ./etl
         dockerfile: Dockerfile-prod
-      volumes:
-        - static_volume:/opt/app/staticfiles
-        - media_volume:/opt/app/mediafiles
       env_file:
         - ./etl/config/.env.prod
       depends_on:
