@@ -38,7 +38,7 @@ PG_DSL = {
     'user': os.environ.get('PG_DB_USER'),
     'password': os.environ.get('PG_DB_PASSWORD'),
     'host': os.environ.get('PG_DB_HOST'),
-    'port': os.environ.get('PF_DB_PORT'),
+    'port': os.environ.get('PG_DB_PORT'),
 }
 
 ES_HOST = os.environ.get('ES_HOST')
