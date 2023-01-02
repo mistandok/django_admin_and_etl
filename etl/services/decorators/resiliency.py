@@ -61,8 +61,6 @@ def backoff(start_sleep_time: float = 1, factor: int = 2, border_sleep_time: flo
                         sleep_time = border_sleep_time
 
                     sleep(sleep_time)
-                    continue
-                break
 
         return inner
 
