@@ -73,29 +73,30 @@ def get_etl_params_for_redis_pg_es(
     )
 
 
-def drop_es_index(es_client: Elasticsearch, index: str):
+def drop_es_index(es_client: Elasticsearch, *indexes: str):
     """
     Вспомогательная функция для обнуления состояний и удаления данных из es.
 
     Args:
         es_client: клиент эластики
-        index: наименование индекса, который нужно удалить.
+        indexes: наименование индекса, который нужно удалить.
     """
-    es_client.options(
-        ignore_status=[HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND],
-    ).indices.delete(index=index)
+    for index in indexes:
+        es_client.options(
+            ignore_status=[HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND],
+        ).indices.delete(index=index)
 
 
-def create_es_index_from_file_if_not_exists(es_client: Elasticsearch, index: str, file_path: str):
+def create_es_index_if_not_exists(es_client: Elasticsearch, *indexes_info: EsIndexInfo):
     """
     Вспомогательная функция, которая создает индекс в Elasticsearch, если его там нет.
 
     Args:
         es_client: клиент Elasticsearch.
-        index: наименование индекса, который нужно создать.
-        file_path: путь до файла с индексом.
+        indexes_info: наименование индекса, который нужно создать.
     """
-    if not es_client.indices.exists(index=index):
-        with open(file_path, 'r') as index_settings_file:
-            index_settings = json.load(index_settings_file)
-            es_client.indices.create(index=index, ignore=HTTPStatus.BAD_REQUEST, body=index_settings)
+    for index_info in indexes_info:
+        if not es_client.indices.exists(index=index_info.name):
+            with open(index_info.file_path, 'r') as index_settings_file:
+                index_settings = json.load(index_settings_file)
+                es_client.indices.create(index=index_info.name, ignore=HTTPStatus.BAD_REQUEST, body=index_settings)

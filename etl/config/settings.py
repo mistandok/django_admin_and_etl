@@ -27,6 +27,8 @@ class ETLProcessType(str, Enum):
     MOVIE_FILM_WORK = 'movie_film_work'
     MOVIE_GENRE = 'movie_genre'
     MOVIE_PERSON = 'movie_person'
+    GENRE = 'genre'
+    PERSON = 'person'
 
 
 class QueryType(str, Enum):
@@ -85,6 +87,8 @@ PROCESS_ES_INDEX = {
     ETLProcessType.MOVIE_FILM_WORK: ElasticsearchIndex.MOVIES,
     ETLProcessType.MOVIE_GENRE: ElasticsearchIndex.MOVIES,
     ETLProcessType.MOVIE_PERSON: ElasticsearchIndex.MOVIES,
+    ETLProcessType.GENRE: ElasticsearchIndex.GENRES,
+    ETLProcessType.PERSON: ElasticsearchIndex.PERSONS,
 }
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
