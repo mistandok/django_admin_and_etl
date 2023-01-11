@@ -29,6 +29,8 @@ class ETLProcessType(str, Enum):
     MOVIE_PERSON = 'movie_person'
     GENRE_CREATED_LINK = 'genre_created_link'
     PERSON_CREATED_LINK = 'person_created_link'
+    GENRE_MODIFIED = 'genre_modified'
+    PERSON_MODIFIED = 'person_modified'
 
 
 class QueryType(str, Enum):
@@ -39,6 +41,8 @@ class QueryType(str, Enum):
     PG_MOVIE_PERSON = 'pg_movie_person'
     PG_GENRE_CREATED_LINK = 'pg_genre_created_link'
     PG_PERSON_CREATED_LINK = 'pg_person_created_link'
+    PG_PERSON_MODIFIED = 'pg_person_modified'
+    PG_GENRE_MODIFIED = 'pg_genre_modified'
 
 
 class ElasticsearchIndex(Enum):
@@ -77,6 +81,8 @@ MODIFIED_STATE = {
     ETLProcessType.MOVIE_PERSON: 'modified_film_work_person',
     ETLProcessType.PERSON_CREATED_LINK: 'modified_person_created_link',
     ETLProcessType.GENRE_CREATED_LINK: 'modified_genre_created_link',
+    ETLProcessType.PERSON_MODIFIED: 'modified_person',
+    ETLProcessType.GENRE_MODIFIED: 'modified_genre',
 }
 
 QUERY_TYPE = {
@@ -85,6 +91,8 @@ QUERY_TYPE = {
     ETLProcessType.MOVIE_PERSON: QueryType.PG_MOVIE_PERSON,
     ETLProcessType.PERSON_CREATED_LINK: QueryType.PG_PERSON_CREATED_LINK,
     ETLProcessType.GENRE_CREATED_LINK: QueryType.PG_GENRE_CREATED_LINK,
+    ETLProcessType.PERSON_MODIFIED: QueryType.PG_PERSON_MODIFIED,
+    ETLProcessType.GENRE_MODIFIED: QueryType.PG_GENRE_MODIFIED,
 }
 
 PROCESS_ES_INDEX = {
@@ -93,6 +101,8 @@ PROCESS_ES_INDEX = {
     ETLProcessType.MOVIE_PERSON: ElasticsearchIndex.MOVIES,
     ETLProcessType.GENRE_CREATED_LINK: ElasticsearchIndex.GENRES,
     ETLProcessType.PERSON_CREATED_LINK: ElasticsearchIndex.PERSONS,
+    ETLProcessType.PERSON_MODIFIED: ElasticsearchIndex.PERSONS,
+    ETLProcessType.GENRE_MODIFIED: ElasticsearchIndex.GENRES,
 }
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'

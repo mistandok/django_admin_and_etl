@@ -58,6 +58,21 @@ PERSON_CREATED_LINK_QUERY = """
     ORDER BY pfw.created
 """
 
+PERSON_MODIFIED_QUERY = """
+    SELECT DISTINCT
+        p.id,
+        p.full_name,
+        p.modified as modified_state
+    FROM
+        content.person_film_work pfw
+    INNER JOIN
+        content.person p
+    ON
+        p.id = pfw.person_id
+    {where_condition}
+    ORDER BY p.modified
+"""
+
 GENRE_CREATED_LINK_QUERY = """
     SELECT DISTINCT
         g.id,
@@ -72,4 +87,20 @@ GENRE_CREATED_LINK_QUERY = """
         g.id = gfw.genre_id
     {where_condition}
     ORDER BY gfw.created
+"""
+
+GENRE_MODIFIED_QUERY = """
+    SELECT DISTINCT
+        g.id,
+        g.name,
+        g.description,
+        g.modified as modified_state
+    FROM
+        content.genre_film_work gfw
+    INNER JOIN
+        content.genre g
+    ON
+        g.id = gfw.genre_id
+    {where_condition}
+    ORDER BY g.modified
 """

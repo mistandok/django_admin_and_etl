@@ -66,6 +66,8 @@ def get_model_for_process_type(process_type: ETLProcessType) -> BaseModel:
         ETLProcessType.MOVIE_GENRE: Movie,
         ETLProcessType.GENRE_CREATED_LINK: Genre,
         ETLProcessType.PERSON_CREATED_LINK: Person,
+        ETLProcessType.GENRE_MODIFIED: Genre,
+        ETLProcessType.PERSON_MODIFIED: Person,
     }
 
     try:
