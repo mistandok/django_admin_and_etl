@@ -5,7 +5,8 @@ from http import HTTPStatus
 from psycopg2.extensions import connection as postgre_conn
 from redis import Redis
 from elasticsearch import Elasticsearch
-from config.settings import QUERY_TYPE, ES_TARGET_INDEX, DB_BUFFER_SIZE
+from config.settings import QUERY_TYPE, DB_BUFFER_SIZE, PROCESS_ES_INDEX, EsIndexInfo
+from services.logs.logs_setup import get_logger
 from services.process.extractors.adapters import PostgreToElasticsearchAdapter
 from services.process.extractors.extractors import PostgreExtractor
 from services.process.processes import ETLProcessType, ETLProcessParameters
@@ -13,6 +14,25 @@ from services.process.queries.queries import ETLQueryFactory
 from services.process.loaders.loaders import ElasticsearchLoader
 from services.storages.key_value_storages import RedisStorage
 from services.storages.key_value_decorators import BackoffKeyValueDecorator
+
+logger = get_logger()
+
+
+def get_index_info_by_process(process_type: ETLProcessType) -> EsIndexInfo:
+    """
+    Функция возвращает информация об индексе для конкретного процесса.
+
+    Args:
+        process_type: тип процесса.
+
+    Returns:
+        EsIndexInfo
+    """
+    try:
+        return PROCESS_ES_INDEX[process_type].value
+    except KeyError as error:
+        logger.error(f'Для процесса {process_type} не задан индекс в Elasticsearch')
+        raise error
 
 
 def get_etl_params_for_redis_pg_es(
@@ -35,6 +55,7 @@ def get_etl_params_for_redis_pg_es(
     Returns:
         ETLProcessParameters
     """
+    index_info = get_index_info_by_process(etl_process_type)
     state_storage = BackoffKeyValueDecorator(RedisStorage(redis_client))
     query = ETLQueryFactory.query_by_type(
         query_type=QUERY_TYPE.get(etl_process_type),
@@ -42,7 +63,7 @@ def get_etl_params_for_redis_pg_es(
         state_storage=state_storage,
     )
     extractor = PostgreToElasticsearchAdapter(PostgreExtractor(pg_conn, query, DB_BUFFER_SIZE))
-    loader = ElasticsearchLoader(es_client, ES_TARGET_INDEX)
+    loader = ElasticsearchLoader(es_client, index_info.name)
 
     return ETLProcessParameters(
         state_storage=state_storage,

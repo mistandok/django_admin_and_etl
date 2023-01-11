@@ -12,6 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 StateStorageAdapterParams = namedtuple('StateStorageAdapterParams', ['storage_type', 'adapter_params'])
 
+EsIndexInfo = namedtuple('EsIndexInfo', ['name', 'file_path'])
+
 load_dotenv(find_dotenv(os.path.join(
     BASE_DIR,
     'config',
@@ -35,6 +37,14 @@ class QueryType(str, Enum):
     PG_MOVIE_PERSON = 'postgres_movie_person'
 
 
+class ElasticsearchIndex(Enum):
+    """Класс описывает индексы для работы с Elasticsearch."""
+
+    MOVIES = EsIndexInfo('movies', os.path.join(BASE_DIR, 'config', 'es_movies_index.json'))
+    GENRES = EsIndexInfo('genres', os.path.join(BASE_DIR, 'config', 'es_genres_index.json'))
+    PERSONS = EsIndexInfo('persons', os.path.join(BASE_DIR, 'config', 'es_persons_index.json'))
+
+
 TIME_TO_RESTART_PROCESSES_SECONDS = 10
 
 REDIS_PORT = os.getenv('REDIS_PORT')
@@ -53,9 +63,7 @@ ES_HOST = os.environ.get('ES_HOST')
 
 ES_PORT = os.environ.get('ES_PORT')
 
-ES_TARGET_INDEX = os.environ.get('ES_TARGET_INDEX')
-
-ES_INDEX_JSON_PATH = os.path.join(BASE_DIR, 'config', 'elasticsearch_index.json')
+ES_INDEX_JSON_PATH = os.path.join(BASE_DIR, 'config', 'es_movies_index.json')
 
 ES_CONNECTION = f'http://{ES_HOST}:{ES_PORT}'
 
@@ -71,6 +79,12 @@ QUERY_TYPE = {
     ETLProcessType.MOVIE_FILM_WORK: QueryType.PG_MOVIE_FILM_WORK,
     ETLProcessType.MOVIE_GENRE: QueryType.PG_MOVIE_GENRE,
     ETLProcessType.MOVIE_PERSON: QueryType.PG_MOVIE_PERSON,
+}
+
+PROCESS_ES_INDEX = {
+    ETLProcessType.MOVIE_FILM_WORK: ElasticsearchIndex.MOVIES,
+    ETLProcessType.MOVIE_GENRE: ElasticsearchIndex.MOVIES,
+    ETLProcessType.MOVIE_PERSON: ElasticsearchIndex.MOVIES,
 }
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'
