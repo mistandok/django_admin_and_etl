@@ -5,7 +5,7 @@ from http import HTTPStatus
 from psycopg2.extensions import connection as postgre_conn
 from redis import Redis
 from elasticsearch import Elasticsearch
-from config.settings import QUERY_TYPE, ES_TARGET_INDEX, ES_INDEX_JSON_PATH, DB_BUFFER_SIZE
+from config.settings import QUERY_TYPE, ES_TARGET_INDEX, DB_BUFFER_SIZE
 from services.process.extractors.adapters import PostgreToElasticsearchAdapter
 from services.process.extractors.extractors import PostgreExtractor
 from services.process.processes import ETLProcessType, ETLProcessParameters
@@ -52,28 +52,29 @@ def get_etl_params_for_redis_pg_es(
     )
 
 
-def drop_es(es_client: Elasticsearch):
+def drop_es_index(es_client: Elasticsearch, index: str):
     """
     Вспомогательная функция для обнуления состояний и удаления данных из es.
 
     Args:
         es_client: клиент эластики
+        index: наименование индекса, который нужно удалить.
     """
     es_client.options(
         ignore_status=[HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND],
-    ).indices.delete(index=ES_TARGET_INDEX)
+    ).indices.delete(index=index)
 
 
-def create_es_index_if_not_exists(es_client: Elasticsearch):
+def create_es_index_from_file_if_not_exists(es_client: Elasticsearch, index: str, file_path: str):
     """
     Вспомогательная функция, которая создает индекс в Elasticsearch, если его там нет.
 
     Args:
         es_client: клиент Elasticsearch.
+        index: наименование индекса, который нужно создать.
+        file_path: путь до файла с индексом.
     """
-    ignore_error = 400
-
-    if not es_client.indices.exists(index=ES_TARGET_INDEX):
-        with open(ES_INDEX_JSON_PATH, 'r') as index_settings_file:
+    if not es_client.indices.exists(index=index):
+        with open(file_path, 'r') as index_settings_file:
             index_settings = json.load(index_settings_file)
-            es_client.indices.create(index=ES_TARGET_INDEX, ignore=ignore_error, body=index_settings)
+            es_client.indices.create(index=index, ignore=HTTPStatus.BAD_REQUEST, body=index_settings)
