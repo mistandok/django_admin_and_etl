@@ -22,9 +22,17 @@ load_dotenv(find_dotenv(os.path.join(
 class ETLProcessType(str, Enum):
     """Тип доступных ETL процессов."""
 
-    FILM_WORK = 'film_work'
-    GENRE = 'genre'
-    PERSON = 'person'
+    MOVIE_FILM_WORK = 'movie_film_work'
+    MOVIE_GENRE = 'movie_genre'
+    MOVIE_PERSON = 'movie_person'
+
+
+class QueryType(str, Enum):
+    """Клас описывает доступные типы запросов."""
+
+    PG_MOVIE_FILM_WORK = 'postgres_movie_filmwork'
+    PG_MOVIE_GENRE = 'postgres_movie_genre'
+    PG_MOVIE_PERSON = 'postgres_movie_person'
 
 
 TIME_TO_RESTART_PROCESSES_SECONDS = 10
@@ -54,15 +62,15 @@ ES_CONNECTION = f'http://{ES_HOST}:{ES_PORT}'
 PROCESS_IS_STARTED_STATE = 'process_is_started'
 
 MODIFIED_STATE = {
-    ETLProcessType.FILM_WORK: 'modified_film_work',
-    ETLProcessType.GENRE: 'modified_genre',
-    ETLProcessType.PERSON: 'modified_person',
+    ETLProcessType.MOVIE_FILM_WORK: 'modified_film_work',
+    ETLProcessType.MOVIE_GENRE: 'modified_film_work_genre',
+    ETLProcessType.MOVIE_PERSON: 'modified_film_work_person',
 }
 
 QUERY_TYPE = {
-    ETLProcessType.FILM_WORK: 'postgres_filmwork',
-    ETLProcessType.GENRE: 'postgres_genre',
-    ETLProcessType.PERSON: 'postgres_person',
+    ETLProcessType.MOVIE_FILM_WORK: QueryType.PG_MOVIE_FILM_WORK,
+    ETLProcessType.MOVIE_GENRE: QueryType.PG_MOVIE_GENRE,
+    ETLProcessType.MOVIE_PERSON: QueryType.PG_MOVIE_PERSON,
 }
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'

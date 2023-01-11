@@ -8,7 +8,7 @@ from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictRow
 
 from services.logs.logs_setup import get_logger
-from ..queries.queries import PostgreETLQuery
+from ..queries.queries import MoviePostgreETLQuery
 
 logger = get_logger()
 
@@ -39,7 +39,7 @@ class BaseExtractor(ABC):
 class PostgreExtractor(BaseExtractor):
     """Класс для извлечения данных из PostgreSQL."""
 
-    def __init__(self, connection: _connection, query: PostgreETLQuery, buffer_size: int):
+    def __init__(self, connection: _connection, query: MoviePostgreETLQuery, buffer_size: int):
         """
         Инициализаирующий метод.
 

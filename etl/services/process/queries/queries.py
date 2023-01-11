@@ -1,24 +1,15 @@
 """Модуль отвечает за описание запросов для ETL-процесса."""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from enum import Enum
 from typing import Optional
 
-from config.settings import ETLProcessType, MODIFIED_STATE
+from config.settings import ETLProcessType, QueryType, MODIFIED_STATE
 from services.storages.key_value_storages import KeyValueStorage
 from services.logs.logs_setup import get_logger
 
-from .pg_templates import BASE_QUERY
+from .pg_templates import MOVIE_BASE_QUERY
 
 logger = get_logger()
-
-
-class QueryType(str, Enum):
-    """Клас описывает доступные типы Key-Value хранилищ."""
-
-    PG_FILMWORK = 'postgres_filmwork'
-    PG_GENRE = 'postgres_genre'
-    PG_PERSON = 'postgres_person'
 
 
 class BaseETLQuery(ABC):
@@ -34,7 +25,7 @@ class BaseETLQuery(ABC):
         """
 
 
-class PostgreETLQuery(BaseETLQuery):
+class MoviePostgreETLQuery(BaseETLQuery):
     """Класс для генерации запросов к PostgreSQL."""
 
     def __init__(self, process_type: ETLProcessType, state_storage: KeyValueStorage):
@@ -57,7 +48,7 @@ class PostgreETLQuery(BaseETLQuery):
             sql-запрос.
         """
         logger.info(f'Генерируем запрос для {self._process_type}')
-        query = BASE_QUERY.format(
+        query = MOVIE_BASE_QUERY.format(
             cte=self._get_cte(),
             modified_state_field=self._get_modified_state_field(),
             where_condition=self._get_where_condition(),
@@ -115,7 +106,7 @@ class PostgreETLQuery(BaseETLQuery):
         return modified_state
 
 
-class FilmworkPostgreETLQuery(PostgreETLQuery):
+class FilmworkMoviePostgreETLQuery(MoviePostgreETLQuery):
     """Класс помогает сгенерировать запрос для Filmwork."""
 
     def _get_order_by(self) -> str:
@@ -144,7 +135,7 @@ class FilmworkPostgreETLQuery(PostgreETLQuery):
         )
 
 
-class PersonPostgreETLQuery(PostgreETLQuery):
+class PersonMoviePostgreETLQuery(MoviePostgreETLQuery):
     """Класс помогает сгенерировать запрос для Person."""
 
     def _get_cte(self) -> str:
@@ -212,7 +203,7 @@ class PersonPostgreETLQuery(PostgreETLQuery):
         return 'max(p.modified) as modified_state'
 
 
-class GenrePostgreETLQuery(PostgreETLQuery):
+class GenreMoviePostgreETLQuery(MoviePostgreETLQuery):
     """Класс помогает сгенерировать запрос для Genre."""
 
     def _get_cte(self) -> str:
@@ -284,9 +275,9 @@ class ETLQueryFactory:
     """Фабрика классов для ETLQuery."""
 
     queries = {
-        QueryType.PG_FILMWORK: FilmworkPostgreETLQuery,
-        QueryType.PG_PERSON: PersonPostgreETLQuery,
-        QueryType.PG_GENRE: GenrePostgreETLQuery,
+        QueryType.PG_MOVIE_FILM_WORK: FilmworkMoviePostgreETLQuery,
+        QueryType.PG_MOVIE_PERSON: PersonMoviePostgreETLQuery,
+        QueryType.PG_MOVIE_GENRE: GenreMoviePostgreETLQuery,
     }
 
     @staticmethod

@@ -1,6 +1,6 @@
 """Модуль содержит шаблоны SQL запросов для PostgreSQL."""
 
-BASE_QUERY = """
+MOVIE_BASE_QUERY = """
     {cte}
     SELECT
         fw.id,
