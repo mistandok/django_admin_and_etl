@@ -42,3 +42,34 @@ MOVIE_BASE_QUERY = """
     GROUP BY fw.id, fw.modified
     {order_by}
 """
+
+PERSON_CREATED_LINK_QUERY = """
+    SELECT DISTINCT
+        p.id,
+        p.full_name,
+        pfw.created as modified_state
+    FROM
+        content.person_film_work pfw
+    INNER JOIN
+        content.person p
+    ON
+        p.id = pfw.person_id
+    {where_condition}
+    ORDER BY pfw.created
+"""
+
+GENRE_CREATED_LINK_QUERY = """
+    SELECT DISTINCT
+        g.id,
+        g.name,
+        g.description,
+        gfw.created as modified_state
+    FROM
+        content.genre_film_work gfw
+    INNER JOIN
+        content.genre g
+    ON
+        g.id = gfw.genre_id
+    {where_condition}
+    ORDER BY gfw.created
+"""

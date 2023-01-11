@@ -27,16 +27,18 @@ class ETLProcessType(str, Enum):
     MOVIE_FILM_WORK = 'movie_film_work'
     MOVIE_GENRE = 'movie_genre'
     MOVIE_PERSON = 'movie_person'
-    GENRE = 'genre'
-    PERSON = 'person'
+    GENRE_CREATED_LINK = 'genre_created_link'
+    PERSON_CREATED_LINK = 'person_created_link'
 
 
 class QueryType(str, Enum):
     """Клас описывает доступные типы запросов."""
 
-    PG_MOVIE_FILM_WORK = 'postgres_movie_filmwork'
-    PG_MOVIE_GENRE = 'postgres_movie_genre'
-    PG_MOVIE_PERSON = 'postgres_movie_person'
+    PG_MOVIE_FILM_WORK = 'pg_movie_filmwork'
+    PG_MOVIE_GENRE = 'pg_movie_genre'
+    PG_MOVIE_PERSON = 'pg_movie_person'
+    PG_GENRE_CREATED_LINK = 'pg_genre_created_link'
+    PG_PERSON_CREATED_LINK = 'pg_person_created_link'
 
 
 class ElasticsearchIndex(Enum):
@@ -65,8 +67,6 @@ ES_HOST = os.environ.get('ES_HOST')
 
 ES_PORT = os.environ.get('ES_PORT')
 
-ES_INDEX_JSON_PATH = os.path.join(BASE_DIR, 'config', 'es_movies_index.json')
-
 ES_CONNECTION = f'http://{ES_HOST}:{ES_PORT}'
 
 PROCESS_IS_STARTED_STATE = 'process_is_started'
@@ -75,20 +75,24 @@ MODIFIED_STATE = {
     ETLProcessType.MOVIE_FILM_WORK: 'modified_film_work',
     ETLProcessType.MOVIE_GENRE: 'modified_film_work_genre',
     ETLProcessType.MOVIE_PERSON: 'modified_film_work_person',
+    ETLProcessType.PERSON_CREATED_LINK: 'modified_person_created_link',
+    ETLProcessType.GENRE_CREATED_LINK: 'modified_genre_created_link',
 }
 
 QUERY_TYPE = {
     ETLProcessType.MOVIE_FILM_WORK: QueryType.PG_MOVIE_FILM_WORK,
     ETLProcessType.MOVIE_GENRE: QueryType.PG_MOVIE_GENRE,
     ETLProcessType.MOVIE_PERSON: QueryType.PG_MOVIE_PERSON,
+    ETLProcessType.PERSON_CREATED_LINK: QueryType.PG_PERSON_CREATED_LINK,
+    ETLProcessType.GENRE_CREATED_LINK: QueryType.PG_GENRE_CREATED_LINK,
 }
 
 PROCESS_ES_INDEX = {
     ETLProcessType.MOVIE_FILM_WORK: ElasticsearchIndex.MOVIES,
     ETLProcessType.MOVIE_GENRE: ElasticsearchIndex.MOVIES,
     ETLProcessType.MOVIE_PERSON: ElasticsearchIndex.MOVIES,
-    ETLProcessType.GENRE: ElasticsearchIndex.GENRES,
-    ETLProcessType.PERSON: ElasticsearchIndex.PERSONS,
+    ETLProcessType.GENRE_CREATED_LINK: ElasticsearchIndex.GENRES,
+    ETLProcessType.PERSON_CREATED_LINK: ElasticsearchIndex.PERSONS,
 }
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S.%f'

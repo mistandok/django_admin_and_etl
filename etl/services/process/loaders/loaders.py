@@ -32,16 +32,17 @@ class BaseLoader(ABC):
 class ElasticsearchLoader(BaseLoader):
     """Класс, отвечающий за загрузку данных в Elasticsearch."""
 
-    def __init__(self, client: Elasticsearch, target_index: str):
+    def __init__(self, client: Elasticsearch, target_index: str, validator: ElasticsearchValidator):
         """
         Инициализирующий метод.
 
         Args:
             client: клиент Elasticsearch.
             target_index: целевой индекс для загрузки.
+            validator: валидатор загружаемых данных.
         """
         self._client = client
-        self._validator = ElasticsearchValidator()
+        self._validator = validator
         self._target_index = target_index
 
     def load(self, data_for_load: Iterable[dict]) -> bool:

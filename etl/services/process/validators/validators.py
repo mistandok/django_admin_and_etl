@@ -5,8 +5,6 @@ from typing import Generator, Iterable
 from pydantic import ValidationError, BaseModel
 from services.logs.logs_setup import get_logger
 
-from .pydantic_models import Movie
-
 logger = get_logger()
 
 
@@ -26,9 +24,14 @@ class BaseValidator(ABC):
 class ElasticsearchValidator(BaseValidator):
     """Класс отвечает за валидацию данных для выгрузки в Elasticsearch."""
 
-    def __init__(self):
-        """Инициализирующий метод."""
-        self.model: type(BaseModel) = Movie
+    def __init__(self, model: BaseModel):
+        """
+        Инициализирующий метод.
+
+        Args:
+            model: модель, по которой валидируют данные.
+        """
+        self.model = model
 
     def get_valid_data(self, data_for_validate: Iterable[dict]) -> Generator:
         """
