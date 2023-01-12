@@ -138,6 +138,9 @@ class GenreFilmwork(UUIDMixin):
         unique_together = [
             ['film_work', 'genre'],
         ]
+        indexes = [
+            models.Index(fields=['created'], name='genre_film_work_created_idx'),
+        ]
 
     def __str__(self):
         """
@@ -177,6 +180,9 @@ class PersonFilmwork(UUIDMixin):
         verbose_name_plural = _('Filmwork participants')
         unique_together = [
             ['film_work', 'person', 'role'],
+        ]
+        indexes = [
+            models.Index(fields=['created'], name='person_film_work_created_idx'),
         ]
 
     def __str__(self):

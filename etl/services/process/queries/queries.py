@@ -1,41 +1,21 @@
 """Модуль отвечает за описание запросов для ETL-процесса."""
 from abc import ABC, abstractmethod
 from datetime import datetime
-from enum import Enum
 from typing import Optional
 
-from config.settings import ETLProcessType, MODIFIED_STATE
+from config.settings import ETLProcessType, QueryType, MODIFIED_STATE
 from services.storages.key_value_storages import KeyValueStorage
 from services.logs.logs_setup import get_logger
-
-from .pg_templates import BASE_QUERY
+from .pg_templates import (
+    MOVIE_BASE_QUERY, GENRE_CREATED_LINK_QUERY, PERSON_CREATED_LINK_QUERY,
+    GENRE_MODIFIED_QUERY, PERSON_MODIFIED_QUERY,
+)
 
 logger = get_logger()
 
 
-class QueryType(str, Enum):
-    """Клас описывает доступные типы Key-Value хранилищ."""
-
-    PG_FILMWORK = 'postgres_filmwork'
-    PG_GENRE = 'postgres_genre'
-    PG_PERSON = 'postgres_person'
-
-
 class BaseETLQuery(ABC):
     """Базовый класс, для генерации запросов для ETL-процесса."""
-
-    @abstractmethod
-    def get_sql(self) -> str:
-        """
-        Метод возвращает SQL, который нужно выполнить для получения данных.
-
-        Returns:
-            sql-запрос.
-        """
-
-
-class PostgreETLQuery(BaseETLQuery):
-    """Класс для генерации запросов к PostgreSQL."""
 
     def __init__(self, process_type: ETLProcessType, state_storage: KeyValueStorage):
         """
@@ -49,6 +29,30 @@ class PostgreETLQuery(BaseETLQuery):
         self._state_storage = state_storage
         self._modified_state_name = MODIFIED_STATE.get(self._process_type)
 
+    @abstractmethod
+    def get_sql(self) -> str:
+        """
+        Метод возвращает SQL, который нужно выполнить для получения данных.
+
+        Returns:
+            sql-запрос.
+        """
+
+    def _get_modified_state(self) -> Optional[datetime]:
+        """
+        Метод возвращает временное значение из хранилища для modified_state.
+
+        Returns:
+            modified_state: текущее значение moified_state в хранилище.
+        """
+        modified_state = self._state_storage.get_value(self._modified_state_name)
+        logger.info(f'modified state для {self._process_type} равно: {modified_state}')
+        return modified_state
+
+
+class MoviePostgreETLQuery(BaseETLQuery):
+    """Класс для генерации запросов к PostgreSQL."""
+
     def get_sql(self) -> str:
         """
         Метод возвращает SQL, который нужно выполнить для получения данных.
@@ -57,7 +61,7 @@ class PostgreETLQuery(BaseETLQuery):
             sql-запрос.
         """
         logger.info(f'Генерируем запрос для {self._process_type}')
-        query = BASE_QUERY.format(
+        query = MOVIE_BASE_QUERY.format(
             cte=self._get_cte(),
             modified_state_field=self._get_modified_state_field(),
             where_condition=self._get_where_condition(),
@@ -103,19 +107,8 @@ class PostgreETLQuery(BaseETLQuery):
         """
         return 'fw.modified modified_state'
 
-    def _get_modified_state(self) -> Optional[datetime]:
-        """
-        Метод возвращает временное значение из хранилища для modified_state.
 
-        Returns:
-            modified_state: текущее значение moified_state в хранилище.
-        """
-        modified_state = self._state_storage.get_value(self._modified_state_name)
-        logger.info(f'modified state для {self._process_type} равно: {modified_state}')
-        return modified_state
-
-
-class FilmworkPostgreETLQuery(PostgreETLQuery):
+class FilmworkMoviePostgreETLQuery(MoviePostgreETLQuery):
     """Класс помогает сгенерировать запрос для Filmwork."""
 
     def _get_order_by(self) -> str:
@@ -144,7 +137,7 @@ class FilmworkPostgreETLQuery(PostgreETLQuery):
         )
 
 
-class PersonPostgreETLQuery(PostgreETLQuery):
+class PersonMoviePostgreETLQuery(MoviePostgreETLQuery):
     """Класс помогает сгенерировать запрос для Person."""
 
     def _get_cte(self) -> str:
@@ -212,7 +205,7 @@ class PersonPostgreETLQuery(PostgreETLQuery):
         return 'max(p.modified) as modified_state'
 
 
-class GenrePostgreETLQuery(PostgreETLQuery):
+class GenreMoviePostgreETLQuery(MoviePostgreETLQuery):
     """Класс помогает сгенерировать запрос для Genre."""
 
     def _get_cte(self) -> str:
@@ -280,13 +273,173 @@ class GenrePostgreETLQuery(PostgreETLQuery):
         return 'max(g.modified) as modified_state'
 
 
+class GenreCreatedLinkPostgreETLQuery(BaseETLQuery):
+    """
+    Класс для генерации запросов к PostgreSQL.
+
+    Формирует запрос для поиска жанров, для которых появилась связь в таблице genre_film_work
+    """
+
+    def get_sql(self) -> str:
+        """
+        Метод возвращает SQL, который нужно выполнить для получения данных.
+
+        Returns:
+            sql-запрос.
+        """
+        logger.info(f'Генерируем запрос для {self._process_type}')
+        query = GENRE_CREATED_LINK_QUERY.format(
+            where_condition=self._get_where_condition(),
+        )
+        logger.info(f'Запрос к БД: \n {query}')
+
+        return query
+
+    def _get_where_condition(self) -> str:
+        """
+        Метод возвращает where условия для запроса.
+
+        Returns:
+            where для sql-запроса.
+        """
+        modified_state = self._get_modified_state()
+
+        if modified_state is None:
+            return 'WHERE TRUE'
+
+        return "WHERE gfw.created > '{modified_state}'::timestamp".format(
+            modified_state=modified_state,
+        )
+
+
+class PersonCreatedLinkPostgreETLQuery(BaseETLQuery):
+    """
+    Класс для генерации запросов к PostgreSQL.
+
+    Формирует запрос для поиска персоналий, для которых появилась связь в таблице person_film_work
+    """
+
+    def get_sql(self) -> str:
+        """
+        Метод возвращает SQL, который нужно выполнить для получения данных.
+
+        Returns:
+            sql-запрос.
+        """
+        logger.info(f'Генерируем запрос для {self._process_type}')
+        query = PERSON_CREATED_LINK_QUERY.format(
+            where_condition=self._get_where_condition(),
+        )
+        logger.info(f'Запрос к БД: \n {query}')
+
+        return query
+
+    def _get_where_condition(self) -> str:
+        """
+        Метод возвращает where условия для запроса.
+
+        Returns:
+            where для sql-запроса.
+        """
+        modified_state = self._get_modified_state()
+
+        if modified_state is None:
+            return 'WHERE TRUE'
+
+        return "WHERE pfw.created > '{modified_state}'::timestamp".format(
+            modified_state=modified_state,
+        )
+
+
+class GenreModifiedPostgreETLQuery(BaseETLQuery):
+    """
+    Класс для генерации запросов к PostgreSQL.
+
+    Формирует запрос для поиска жанров, для которых существуют фильмы и которые были изменены.
+    """
+
+    def get_sql(self) -> str:
+        """
+        Метод возвращает SQL, который нужно выполнить для получения данных.
+
+        Returns:
+            sql-запрос.
+        """
+        logger.info(f'Генерируем запрос для {self._process_type}')
+        query = GENRE_MODIFIED_QUERY.format(
+            where_condition=self._get_where_condition(),
+        )
+        logger.info(f'Запрос к БД: \n {query}')
+
+        return query
+
+    def _get_where_condition(self) -> str:
+        """
+        Метод возвращает where условия для запроса.
+
+        Returns:
+            where для sql-запроса.
+        """
+        modified_state = self._get_modified_state()
+
+        if modified_state is None:
+            return 'WHERE TRUE'
+
+        return "WHERE g.modified > '{modified_state}'::timestamp".format(
+            modified_state=modified_state,
+        )
+
+
+class PersonModifiedPostgreETLQuery(BaseETLQuery):
+    """
+    Класс для генерации запросов к PostgreSQL.
+
+    Формирует запрос для поиска персоналий, для которых появилась связь в таблице person_film_work
+    """
+
+    def get_sql(self) -> str:
+        """
+        Метод возвращает SQL, который нужно выполнить для получения данных.
+
+        Returns:
+            sql-запрос.
+        """
+        logger.info(f'Генерируем запрос для {self._process_type}')
+        query = PERSON_MODIFIED_QUERY.format(
+            where_condition=self._get_where_condition(),
+        )
+        logger.info(f'Запрос к БД: \n {query}')
+
+        return query
+
+    def _get_where_condition(self) -> str:
+        """
+        Метод возвращает where условия для запроса.
+
+        Returns:
+            where для sql-запроса.
+        """
+        modified_state = self._get_modified_state()
+
+        if modified_state is None:
+            return 'WHERE TRUE'
+
+        return "WHERE p.modified > '{modified_state}'::timestamp".format(
+            modified_state=modified_state,
+        )
+
+
 class ETLQueryFactory:
     """Фабрика классов для ETLQuery."""
 
     queries = {
-        QueryType.PG_FILMWORK: FilmworkPostgreETLQuery,
-        QueryType.PG_PERSON: PersonPostgreETLQuery,
-        QueryType.PG_GENRE: GenrePostgreETLQuery,
+        QueryType.PG_MOVIE_FILM_WORK: FilmworkMoviePostgreETLQuery,
+        QueryType.PG_MOVIE_PERSON: PersonMoviePostgreETLQuery,
+        QueryType.PG_MOVIE_GENRE: GenreMoviePostgreETLQuery,
+        QueryType.PG_GENRE_CREATED_LINK: GenreCreatedLinkPostgreETLQuery,
+        QueryType.PG_PERSON_CREATED_LINK: PersonCreatedLinkPostgreETLQuery,
+        QueryType.PG_GENRE_MODIFIED: GenreModifiedPostgreETLQuery,
+        QueryType.PG_PERSON_MODIFIED: PersonModifiedPostgreETLQuery,
     }
 
     @staticmethod
