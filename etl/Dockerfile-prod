@@ -24,7 +24,6 @@ RUN  apt-get update \
      && useradd -d $APP_DIR -r -g web web \
      && chown web:web -R $APP_DIR \
      && mkdir $APP_DIR/etl_logs \
-     && touch $APP_DIR/etl_logs/etl_process_log.log \
      && pip install --upgrade pip
 
 RUN pip install -r requirements.txt
@@ -32,8 +31,7 @@ RUN pip install -r requirements.txt
 # Скопируйте всё оставшееся. Для ускорения сборки образа эту команду стоит разместить ближе к концу файла.
 COPY . $APP_DIR
 
-RUN chmod u+x $APP_DIR/start-etl.sh \
-    && setfacl -m u:web:rwx $APP_DIR/etl_logs/etl_process_log.log
+RUN chmod u+x $APP_DIR/start-etl.sh
 
 
 USER web
