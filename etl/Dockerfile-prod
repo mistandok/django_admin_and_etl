@@ -24,7 +24,6 @@ RUN  apt-get update \
      && useradd -d $APP_DIR -r -g web web \
      && chown web:web -R $APP_DIR \
      && mkdir $APP_DIR/etl_logs \
-     && touch $APP_DIR/etl_logs/etl_process_log.log \
      && pip install --upgrade pip
 
 RUN pip install -r requirements.txt
