@@ -1,6 +1,7 @@
 """Модуль содержит настройки для работы ETL."""
 import os
 from collections import namedtuple
+from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
 
@@ -12,13 +13,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 StateStorageAdapterParams = namedtuple('StateStorageAdapterParams', ['storage_type', 'adapter_params'])
 
-EsIndexInfo = namedtuple('EsIndexInfo', ['name', 'file_path'])
-
 load_dotenv(find_dotenv(os.path.join(
     BASE_DIR,
     'config',
     '.env.prod',
 )))
+
+
+@dataclass(frozen=True)
+class EsIndexInfo:
+    """Класс описывает информацию об индексе эластики."""
+
+    name: str
+    file_path: str
 
 
 class ETLProcessType(str, Enum):

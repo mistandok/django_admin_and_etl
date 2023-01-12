@@ -6,7 +6,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from config.settings import (
     PG_DSL, ES_CONNECTION, REDIS_HOST, REDIS_PORT, ETLProcessType, TIME_TO_RESTART_PROCESSES_SECONDS,
-    PROCESS_ES_INDEX,
+    ElasticsearchIndex,
 )
 from services.decorators.resiliency import backoff
 from services.context_managers.managers import redis_context, es_context
@@ -21,7 +21,7 @@ def main():
 
     with redis_context(REDIS_HOST, REDIS_PORT) as redis, es_context(ES_CONNECTION) as es, \
             contextlib.closing(connect(**PG_DSL, cursor_factory=DictCursor)) as pg:
-        indexes_info = {index_info.value for index_info in PROCESS_ES_INDEX.values()}
+        indexes_info = {index.value for index in ElasticsearchIndex}
         create_es_index_if_not_exists(es, *indexes_info)
 
         while True:
