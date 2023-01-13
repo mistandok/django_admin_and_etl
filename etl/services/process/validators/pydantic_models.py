@@ -25,11 +25,12 @@ class Movie(BaseModel):
     genre: Optional[List[str]]
     title: Optional[str]
     description: Optional[str]
-    director: List[str]
+    directors_names: Optional[List[str]]
     actors_names: Optional[List[str]]
     writers_names: Optional[List[str]]
     actors: Optional[List[PersonMovie]]
     writers: Optional[List[PersonMovie]]
+    directors: Optional[List[PersonMovie]]
 
 
 class Genre(BaseModel):
@@ -47,6 +48,9 @@ class Person(BaseModel):
     _id: str
     id: str
     full_name: str
+    actor: List[str]
+    writer: List[str]
+    director: List[str]
 
 
 @lru_cache()
