@@ -8,10 +8,7 @@ MOVIE_BASE_QUERY = """
         array_agg(DISTINCT g.name) FILTER (WHERE g.id IS NOT NULL) as genre,
         fw.title,
         fw.description,
-        COALESCE (
-            array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director'),
-            ARRAY[]::text[]
-        ) director,
+        array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director') directors_names,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'actor') actors_names,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'writer') writers_names,
         COALESCE (
@@ -32,6 +29,15 @@ MOVIE_BASE_QUERY = """
            ) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'writer'),
            '[]'
         ) as writers,
+        COALESCE (
+           json_agg(
+               DISTINCT jsonb_build_object(
+                   'id', p.id,
+                   'name', p.full_name
+               )
+           ) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director'),
+           '[]'
+        ) as directors,
         {modified_state_field}
     FROM content.film_work fw
     LEFT JOIN content.person_film_work pfw ON pfw.film_work_id = fw.id
@@ -47,6 +53,11 @@ PERSON_CREATED_LINK_QUERY = """
     SELECT DISTINCT
         p.id,
         p.full_name,
+        COALESCE(array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'actor'), ARRAY[]::text[]) actor,
+        COALESCE(
+            array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'director'), ARRAY[]::text[]
+        ) director,
+        COALESCE(array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'writer'), ARRAY[]::text[]) writer,
         pfw.created as modified_state
     FROM
         content.person_film_work pfw
@@ -55,6 +66,7 @@ PERSON_CREATED_LINK_QUERY = """
     ON
         p.id = pfw.person_id
     {where_condition}
+    GROUP BY p.id, p.full_name, pfw.created
     ORDER BY pfw.created
 """
 
@@ -62,6 +74,11 @@ PERSON_MODIFIED_QUERY = """
     SELECT DISTINCT
         p.id,
         p.full_name,
+        COALESCE(array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'actor'), ARRAY[]::text[]) actor,
+        COALESCE(
+            array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'director'), ARRAY[]::text[]
+        ) director,
+        COALESCE(array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'writer'), ARRAY[]::text[]) writer,
         p.modified as modified_state
     FROM
         content.person_film_work pfw
@@ -70,6 +87,7 @@ PERSON_MODIFIED_QUERY = """
     ON
         p.id = pfw.person_id
     {where_condition}
+    GROUP BY p.id, p.full_name, p.modified
     ORDER BY p.modified
 """
 
