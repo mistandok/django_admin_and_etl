@@ -5,7 +5,15 @@ MOVIE_BASE_QUERY = """
     SELECT
         fw.id,
         fw.rating imdb_rating,
-        array_agg(DISTINCT g.name) FILTER (WHERE g.id IS NOT NULL) as genre,
+        COALESCE (
+           json_agg(
+               DISTINCT jsonb_build_object(
+                   'id', g.id,
+                   'name', g.name
+               )
+           ) FILTER (WHERE g.id IS NOT NULL),
+           '[]'
+        ) as genres,
         fw.title,
         fw.description,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director') directors_names,

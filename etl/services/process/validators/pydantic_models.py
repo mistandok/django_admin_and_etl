@@ -16,13 +16,20 @@ class PersonMovie(BaseModel):
     name: str
 
 
+class GenreMovie(BaseModel):
+    """Модель, описывающая жанры для фильмов."""
+
+    id: str
+    name: str
+
+
 class Movie(BaseModel):
     """Модель, описывающая фильм."""
 
     _id: str
     id: str
     imdb_rating: Optional[float]
-    genre: Optional[List[str]]
+    genres: Optional[List[GenreMovie]]
     title: Optional[str]
     description: Optional[str]
     directors_names: Optional[List[str]]
