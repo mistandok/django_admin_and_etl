@@ -32,6 +32,7 @@ class Movie(BaseModel):
     genres: Optional[List[GenreMovie]]
     title: Optional[str]
     description: Optional[str]
+    persons: Optional[List[str]]
     directors_names: Optional[List[str]]
     actors_names: Optional[List[str]]
     writers_names: Optional[List[str]]

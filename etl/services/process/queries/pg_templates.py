@@ -16,6 +16,7 @@ MOVIE_BASE_QUERY = """
         ) as genres,
         fw.title,
         fw.description,
+        array_agg(DISTINCT p.id::text) FILTER (WHERE p.id IS NOT NULL) persons,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'director') directors_names,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'actor') actors_names,
         array_agg(DISTINCT p.full_name) FILTER (WHERE p.id IS NOT NULL AND pfw.role = 'writer') writers_names,
