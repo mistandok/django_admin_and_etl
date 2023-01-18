@@ -86,6 +86,9 @@
         "type": "text",
         "analyzer": "ru_en"
       },
+      "persons": {
+        "type": "keyword"
+      },
       "actors": {
         "type": "nested",
         "dynamic": "strict",
