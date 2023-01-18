@@ -59,6 +59,8 @@ class Person(BaseModel):
     actor: List[str]
     writer: List[str]
     director: List[str]
+    other: List[str]
+    films: List[str]
 
 
 @lru_cache()

@@ -67,6 +67,11 @@ PERSON_CREATED_LINK_QUERY = """
             array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'director'), ARRAY[]::text[]
         ) director,
         COALESCE(array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role = 'writer'), ARRAY[]::text[]) writer,
+        COALESCE(
+            array_agg(DISTINCT pfw.film_work_id::text) FILTER (WHERE pfw.role NOT IN ('writer', 'director', 'actor')),
+            ARRAY[]::text[]
+        ) other,
+        COALESCE(array_agg(DISTINCT pfw.film_work_id::text), ARRAY[]::text[]) films,
         pfw.created as modified_state
     FROM
         content.person_film_work pfw

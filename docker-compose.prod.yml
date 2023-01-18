@@ -1,6 +1,7 @@
 version: '3'
 services:
   service:
+    image: mistandok/online-cinema-admin-panel:v1
     build:
       context: ./movies_admin
       dockerfile: Dockerfile-prod
@@ -33,6 +34,7 @@ services:
     ports:
       - 80:80
   etl:
+      image: mistandok/online-cinema-etl-process:v2
       build:
         context: ./etl
         dockerfile: Dockerfile-prod
